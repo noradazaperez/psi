@@ -15,7 +15,7 @@ class SecondWeekTests(TestCase):
     def setUpTestData(cls):
         # Set up non-modified objects used by all test methods
         try:
-            from P1.locallibrary.populate_catalog import populate
+            from populate_catalog import populate
             populate()
         except ImportError:
             print('The module populate_catalog does not exist')

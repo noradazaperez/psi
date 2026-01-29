@@ -176,3 +176,13 @@ Filtros:
         in
         gt (greater than)
         startswith
+
+
+## Errores y soluciones
+django.core.exceptions.ImproperlyConfigured: Requested setting INSTALLED_APPS, but settings are not configured. You must either define the environment variable DJANGO_SETTINGS_MODULE or call settings.configure() before accessing settings.
+    Eso es que no has explicado que settings file usar, correr:
+    export DJANGO_SETTINGS_MODULE=¡link a los ajustes!
+        El link es (*) locallibrary.settings
+    
+    Acceder al shell
+        python3 manage.py shell
