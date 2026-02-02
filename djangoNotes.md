@@ -43,6 +43,7 @@ Run the developement server
 python3 manage.py runserver
 ```
 
+Ver sección de bases de datos para ver cómo cambiarla a usar postgre y usuarios y etc
 
 ### urls.py
 Resumen: 
@@ -177,6 +178,99 @@ Filtros:
         gt (greater than)
         startswith
 
+
+## Bases de datos
+
+Una vez instaladas las dependencias, se debe modificar la variable DATABASES del fichero settings.py de la siguiente manera:
+
+```python
+import dj_database_url
+
+db_from_env = dj_database_url.config(default='postgres://alumnodb:alumnodb@localhost:5432/psi', conn_max_age=500)
+
+DATABASES['default'].update(db_from_env)
+```
+
+Para borrar la base de datos se puede usar el comando 
+```bash
+dropdb -U alumnodb -h localhost psi
+```
+
+Para crear la base de datos
+```bash
+createdb -U alumnodb -h localhost psi
+```
+Crear la base de datos, es necesario volver a poblarla ejecutando el script populate_catalog.py.
+
+NOTA: las bases de datos creadas usando PostgreSQL no se borran al apagar el ordenador del laboratorio. Es recomendable borrarlas de una vez a otra
+
+## Admin page 
+
+Registrar modelos en la página de admin. Por ejemplo, para dejarte añadir y modificar instancias de los modelos
+```python
+from .models import ¡modelo!
+
+admin.site.register(¡modelo, como clase, con la primera letra en mayúscula!)
+```
+
+Crear superusuario
+```bash
+python3 manage.py createsuperuser
+```
+
+### Customize 
+To change how a model is displayed in the admin interface you define a ¡Model name. El nombre del modelo va en mayúsucla!Admin class (which describes the layout) and register it with the model
+(*) AuthorAdmin
+```python
+# Register the Admin classes for Book using the decorator
+@admin.register(Book)
+class BookAdmin(admin.ModelAdmin):
+    pass
+
+# Define the admin class
+class AuthorAdmin(admin.ModelAdmin):
+    pass
+
+# Register the admin class with the associated model
+admin.site.register(Author, AuthorAdmin)
+```
+Ambas maneras sirven para registrar el adminclass. Para usar esto, hay que comentar la línea donde se importa de manera normal
+
+Things you can add or change with these classes:
+list_display
+    (*) list_display = ('last_name', 'first_name', 'date_of_birth', 'date_of_death')
+    Te permite estaer qué campos se enseñan cuando se muestran las instancias en formato lista
+    Es un parámetro de clase y se especifican los campos igualándolo a una tupla.
+    Los parámetros deben aparecer en la tupla en el orden en el que quieres que aparezcan en la lista
+        Si alguno de los atributos especificados es un foreign key, te pondrá su __str__
+        No se permite asociar un atributo a un ManyToManyField, pero sí que puedes asociarlo a una función que devuelva un string
+            A esta función se le puede añadir un atributo "short_description" que será el nombre de la columna a la que lo asociará
+            (*)
+            ```python
+                def display_genre(self):
+                    """Create a string for the Genre. This is required to display genre in Admin."""
+                    return ', '.join(genre.name for genre in self.genre.all()[:3])
+
+                display_genre.short_description = 'Genre'
+            ```
+list_filter
+    (*) list_filter = ('status', 'due_back')
+    Para hacer filtros
+fields
+    (*) fields = ['first_name', 'last_name', ('date_of_birth', 'date_of_death')]
+    fields attribute lists just those fields that are to be displayed on the form, in order.
+    Fields are displayed vertically by default, but will display horizontally if you further group them in a tuple (as shown in the "date" fields above).
+fieldsets
+    (*) fieldsets = (
+            (None, {
+                'fields': ('book', 'imprint', 'id')
+            }),
+            ('Availability', {
+                'fields': ('status', 'due_back')
+            }),
+        )
+    You can add "sections" to group related model information within the detail form, using the fieldsets attribute.
+    Each section has its own title (or None, if you don't want a title) and an associated tuple of fields in a dictionary
 
 ## Errores y soluciones
 django.core.exceptions.ImproperlyConfigured: Requested setting INSTALLED_APPS, but settings are not configured. You must either define the environment variable DJANGO_SETTINGS_MODULE or call settings.configure() before accessing settings.
