@@ -1,6 +1,5 @@
-Queda terminar de entender lo de BookInstanceInline y hacer los apuntes de eso estoy leyendo de [aquí](https://docs.djangoproject.com/en/5.0/ref/contrib/admin/#django.contrib.admin.ModelAdmin.inlines)
-
-Estoy justo antes de los ejercicios de la parte 4
+Segundo ejercicio de la parte 5
+    
 
 # psi
 
@@ -27,9 +26,12 @@ En djangoNotes, la parte de bases de datos pone el setup que hay que hacer
 Activar sql:
 sudo systemctl restart postgresql
 
-## Pregs
+## Pregs resueltas
 
-- He tenido que cambiar el código proporcionado en el tutorial para pasar un test (código de una parte que yo no he modificado ni tenía que modificar), he hecho bien?
-    - En el código dado era "date of birth" y ellos pedían que fuera "birth"
-        - Código original: date_of_birth = models.DateField(null=True, blank=True)
 - Soy incapaz de conectarme a la base de datos
+    - sudo systemctl restart postgresql
+
+## Pregs
+No sé qué significa "number of books that contain a particular word"
+        De dónde saco la palabra?
+        Que contienen la palabra donde?

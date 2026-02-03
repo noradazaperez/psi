@@ -1,24 +1,22 @@
-### venv
+## venv
 
 python3 -m venv p1_env; source p1_env/bin/activate
 pip3 install -r P1/requirements.txt
 
-### Setup
-Create proyect
+## Setup
+1. Create proyect
 ```bash
 django-admin startproject locallibrary
 cd locallibrary
 ```
-
-Create app 
+2. Create app 
 ```bash
 python3 manage.py startapp catalog
 ```
 
-Add app to proyect:
-
-In settings.py of the proyect folder
-
+3. Add app to proyect:
+    
+    3.1. In settings.py of the proyect folder
 ```python
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -32,20 +30,37 @@ INSTALLED_APPS = [
 ]
 ```
 
-Manage database
+4. Manage database
 ```bash
 python3 manage.py makemigrations
 python3 manage.py migrate
 ```
 
-Run the developement server
+5. Run the developement server
 ```bash
 python3 manage.py runserver
 ```
 
-Ver sección de bases de datos para ver cómo cambiarla a usar postgre y usuarios y etc
+6. Ver sección de bases de datos para ver cómo cambiarla a usar postgre y usuarios y etc
 
-### urls.py
+7. Configurar el servido de archivos estáticos
+    
+    7.1. Make sure that django.contrib.staticfiles is included in your INSTALLED_APPS.
+
+    7.2. In your settings file , define STATIC_URL. Es la dirección relativa desde la carpeta donde está la app
+
+    7.3. Para usarlo en los templates:
+```HTML
+<!-- Add additional CSS in static file -->
+{% load static %}
+<link rel="stylesheet" href="{% static '¡dirección desde la carpeta configurada con STATIC_URL al archivo!' %}" />
+```
+
+        - La primera fila carga el tag static
+        - La segunda es cómo usarla dentro del archivo
+
+
+## urls.py
 Resumen: 
 
 Function views
@@ -65,7 +80,72 @@ Redirecting
 
 Note: The route in path() is a string defining a URL pattern to match. This string might include a named variable (in angle brackets), e.g., 'catalog/<id>/'. This pattern will match a URL like catalog/any_chars/ and pass any_chars to the view as a string with the parameter name id
 
-### models
+### path
+El primer parámetro es la dirección en el link
+El segundo parámetro es la función que habría que llamar
+    Normalmente, empezará con views. al estár la función contenida en el archivo views (views.¡tu función!)
+El tercer parámetro es el nombre de este mapping particular
+    You can use the name to "reverse" the mapper
+        i.e., to dynamically create a URL that points to the resource that the mapper is designed to handle
+    (*) <a href="{% url 'index' %}">Home</a>.
+        El link que quedará guardado al lado de href es el que apunta a la función a la que apunte el mapping llamado index
+        
+
+## views.py
+The render() function accepts the following parameters:
+- the original request object, which is an HttpRequest.
+- an HTML template with placeholders for the data.
+- a context variable, which is a Python dictionary, containing the data to insert into the placeholders.
+
+### Templates
+
+Si la app se ha generado con startapp el programa se esperará que los templates estén en la carpeta ¡nombre aplicación!/templates
+
+variables are enclosed in double braces (*) {{ num_books }}
+tags are enclosed in single braces with percentage signs (*) {% extends "base_generic.html" %}
+
+Cargar contenido estático
+    Within the template you first call the load template tag specifying "static" to add the template library. 
+    You can then use the static template tag and specify the relative URL to the required file.
+    <!-- Add additional CSS in static file -->
+    {% load static %} 
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+Añadir comentarios
+    {# ¡comentario! #}
+Añadir links a otras páginas de tu proyecto
+    <a href="{% url '¡nombre del mapping!' %}"> ¡Display word del link!</a>
+    Ver la sección path, el tercer argumento, para el nombre del mapping
+    No olvidar las comitas después del url!!!
+    Para pasarle argumentos es:
+        <a href="{% url '¡nombre del mapping!' '¡argumento 1!' %}"> ¡Display word del link!</a>
+
+**Configurar**
+Se hace cambiando la variable TEMPLATES de settings.py
+    DIRS 
+        Modificando esta variable se pueden especificar otras carpetas donde encontrar templates
+    APP_DIRS
+        Cuando es True le dice a django que busque templates dentro de una carpeta templates dentro de cada aplicación y no sólo en la carpeta grande del proyecto
+
+
+**Herencia de clases**
+Un template padre puede tener bloques que los templates hijos modifiquen. 
+
+Los bloques tienen esta estructura:
+    ```html
+    {% block ¡nombre del bloque! %}
+    ¡Código default que tendrá el bloque si los hijos no lo modifican!
+    {% endblock %}
+    ```
+    Estos bloques pueden estar dentro de títulos y etc
+
+Para heredar de otro archivo
+    ```html
+    {% extends "¡nombre del archivo terminando en .html!" %}
+    ```
+
+Para sobreescribir un bloque, es igual que declararlo, añadiendo los tags de block y endblock con el nombre
+
+## models
 
 models to represent selection-list options (e.g., like a drop down list of choices), rather than hard coding the choices into the website itself
 
@@ -160,7 +240,7 @@ wild_books = Book.objects.filter(title__contains='wild')
 number_wild_books = wild_books.count()
 ```
 
-#### Usar los modelos
+### Usar los modelos
 
 Filtros: 
     Filter on a field that defines a one-to-many relationship to another model (e.g., a ForeignKey)
@@ -179,7 +259,7 @@ Filtros:
         startswith
 
 
-## Bases de datos
+# Bases de datos
 
 Una vez instaladas las dependencias, se debe modificar la variable DATABASES del fichero settings.py de la siguiente manera:
 
@@ -204,7 +284,7 @@ Crear la base de datos, es necesario volver a poblarla ejecutando el script popu
 
 NOTA: las bases de datos creadas usando PostgreSQL no se borran al apagar el ordenador del laboratorio. Es recomendable borrarlas de una vez a otra
 
-## Admin page 
+# Admin page 
 
 Registrar modelos en la página de admin. Por ejemplo, para dejarte añadir y modificar instancias de los modelos
 ```python
@@ -218,7 +298,7 @@ Crear superusuario
 python3 manage.py createsuperuser
 ```
 
-### Customize 
+## Customize 
 To change how a model is displayed in the admin interface you define a ¡Model name. El nombre del modelo va en mayúsucla!Admin class (which describes the layout) and register it with the model
 (*) AuthorAdmin
 ```python
@@ -271,8 +351,21 @@ fieldsets
         )
     You can add "sections" to group related model information within the detail form, using the fieldsets attribute.
     Each section has its own title (or None, if you don't want a title) and an associated tuple of fields in a dictionary
+inlines [Más información](https://docs.djangoproject.com/en/5.0/ref/contrib/admin/#django.contrib.admin.ModelAdmin.inlines)
+    (*) inlines = [BookInstanceInline]
+    Te permite editar instancias asociadas a la vez (por ejemplo, que pueda añadir una instancia de libro cada vez que añado un libro)
+    Instancias la variable con una lista de clases Inline, que tienes que declarar antes
+    Clases inline
+        Declarar: 
+            (*)
+            class BooksInstanceInline(admin.TabularInline):
+                model = BookInstance
+        Variables que se pueden añadir:
+            extra
+                Cuando se pone a 0 te enseña sólo instancias con datos, no te da la opción de generar una a no ser que le des al botón
 
-## Errores y soluciones
+
+# Errores y soluciones
 django.core.exceptions.ImproperlyConfigured: Requested setting INSTALLED_APPS, but settings are not configured. You must either define the environment variable DJANGO_SETTINGS_MODULE or call settings.configure() before accessing settings.
     Eso es que no has explicado que settings file usar, correr:
     export DJANGO_SETTINGS_MODULE=¡link a los ajustes!
