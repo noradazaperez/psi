@@ -20,6 +20,7 @@ En djangoNotes, la parte de bases de datos pone el setup que hay que hacer
 ## No olvidar
 - Para alcanzar una cobertura del 100 % se programará un fichero llamado test_additional.py con tests creados por el estudiante que garanticen alcanzar la máxima cobertura. Este fichero se situar´a en la carpeta catalog/tests.
 - Pasar lo de flake8
+- Cerrar servidor postgresql
 
 ## Errores
 Activar sql:
