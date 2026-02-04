@@ -1,5 +1,4 @@
-Segundo ejercicio de la parte 5
-    
+Terminados ejercicios parte 5    
 
 # psi
 
