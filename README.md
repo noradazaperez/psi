@@ -33,5 +33,10 @@ sudo systemctl restart postgresql
 
 ## Pregs
 No sé qué significa "number of books that contain a particular word"
-        De dónde saco la palabra?
-        Que contienen la palabra donde?
+    De dónde saco la palabra?
+    Que contienen la palabra donde?
+- He hecho lo siguiente a requirements.txt para q me funcione en local
+    #psycopg2==2.9.10
+    psycopg2-binary==2.9.10
+    - En el original el # está swapped
+    - Si no, no me compila porq no tengo los ficheros de C necesarios
