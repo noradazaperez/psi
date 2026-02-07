@@ -1,4 +1,4 @@
-Terminados ejercicios parte 5    
+Llegado hasta for loops y condicionales en el tutorial parte 6
 
 # psi
 

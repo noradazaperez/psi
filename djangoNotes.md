@@ -97,6 +97,46 @@ The render() function accepts the following parameters:
 - an HTML template with placeholders for the data.
 - a context variable, which is a Python dictionary, containing the data to insert into the placeholders.
 
+### Useful generic classes for views
+**ListView**
+```python
+from django.views import generic
+
+class BookListView(generic.ListView):
+    model = Book
+```
+
+The generic view will query the database to get all records for the specified model (Book) then render a template located at /¡application_name!/¡the_model_name!_list.html inside the application's /¡application_name!/templates/ directory (in this case /catalog/templates/catalog/book_list.html).
+
+Within the template you can access the list of books with the template variable named object_list OR  ¡the model name!_list.
+
+Atributos q se pueden añadir:
+    context_object_name  
+        Nombre de la variable con los objetos q se pasará al template
+    queryset
+        Lista de elementos que se pasará al template
+        (*) queryset = Book.objects.filter(title__icontains='war')[:5] # Get 5 books containing the title war
+    template_name 
+        Especificar el nombre del template y su localización
+
+Métodos que se pueden sobreescribir:
+    get_queryset(self)
+        Debe retornar la lista que quieres que se pase al template
+    get_context_data(self, **kwargs)
+        Para pasarle más información al template
+        Hace falta seguir el siguiente proceso:
+            First get the existing context from our superclass. 
+            Then add your new context information.
+            Then return the new (updated) context.
+        (*)
+        ```python
+        # Call the base implementation first to get the context
+        context = super(BookListView, self).get_context_data(**kwargs)
+        # Create any data and add it to the context
+        context['some_data'] = 'This is just some data'
+        return context
+        ```
+
 ### Templates
 
 Si la app se ha generado con startapp el programa se esperará que los templates estén en la carpeta ¡nombre aplicación!/templates
@@ -118,6 +158,17 @@ Añadir links a otras páginas de tu proyecto
     No olvidar las comitas después del url!!!
     Para pasarle argumentos es:
         <a href="{% url '¡nombre del mapping!' '¡argumento 1!' %}"> ¡Display word del link!</a>
+fors con listas 
+```html
+    <ul>
+      {% for book in book_list %}
+      <li>
+        <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+        ({{book.author}})
+      </li>
+      {% endfor %}
+    </ul>
+```
 
 **Configurar**
 Se hace cambiando la variable TEMPLATES de settings.py
