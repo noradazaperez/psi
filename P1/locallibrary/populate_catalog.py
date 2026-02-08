@@ -5,6 +5,11 @@ EPS-UAM 2026
 """
 
 import os
+import sys
+
+# Add the locallibrary directory to Python path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'locallibrary'))
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'locallibrary.settings')
 
 import django

@@ -35,6 +35,8 @@ class Book(models.Model):
     author = models.ForeignKey('Author', on_delete=models.RESTRICT, null=True)
     # Foreign Key used because book can only have one author, but authors can have multiple books.
     # Author as a string rather than object because it hasn't been declared yet in file.
+    language = models.ForeignKey(
+        'Language', on_delete=models.SET_NULL, null=True)
 
     summary = models.TextField(
         max_length=1000, help_text="Enter a brief description of the book")
@@ -88,12 +90,34 @@ class BookInstance(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return f'{self.id} ({self.book.title})'
+class Language(models.Model):
+    """Model representing a Language (e.g. English, French, Japanese, etc.)"""
+    name = models.CharField(max_length=200,
+                            unique=True,
+                            help_text="Enter the book's natural language (e.g. English, French, Japanese etc.)")
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular language instance."""
+        return reverse('language-detail', args=[str(self.id)])
+
+    def __str__(self):
+        """String for representing the Model object (in Admin site etc.)"""
+        return self.name
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                Lower('name'),
+                name='language_name_case_insensitive_unique',
+                violation_error_message = "Language already exists (case insensitive match)"
+            ),
+        ]
 
 class Author(models.Model):
     """Model representing an author."""
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    date_of_birth = models.DateField(null=True, blank=True)
+    date_of_birth = models.DateField('birth', null=True, blank=True)
     date_of_death = models.DateField('Died', null=True, blank=True)
 
     class Meta:
