@@ -145,6 +145,9 @@ Atributos q se pueden añadir:
         (*) queryset = Book.objects.filter(title__icontains='war')[:5] # Get 5 books containing the title war
     template_name 
         Especificar el nombre del template y su localización
+    paginate_by
+        Especificar el número de records que habrá por página si se pagina
+        OJO! Si vas a paginar tiene q haber un orden definiod a la clase
 
 Métodos que se pueden sobreescribir:
     get_queryset(self)
@@ -269,9 +272,38 @@ Para heredar de otro archivo
 
 Para sobreescribir un bloque, es igual que declararlo, añadiendo los tags de block y endblock con el nombre
 
+**paginación**
+OJO: cuando paginas, la clase paginada tiene que tener un órden definido o django se vuelve loco (error)
+    Soluciones:
+        Añadir un orden el el META de la clase
+        Add a queryset attribute in your custom class-based view, specifying an order_by()
+        Adding a get_queryset method to your custom class-based view and also specify the order_by()
+
+El view necesita ser modificado para tener un paginate_by parámetro
+Usar: ponerlo justo después del block a paginar
+```html
+{% block pagination %}
+    {% if is_paginated %}
+        <div class="pagination">
+            <span class="page-links">
+                {% if page_obj.has_previous %}
+                    <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">previous</a>
+                {% endif %}
+                <span class="page-current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+                {% if page_obj.has_next %}
+                    <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">next</a>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+  {% endblock %}
+```
+
 ## models
 
-models to represent selection-list options (e.g., like a drop down list of choices), rather than hard coding the choices into the website itself
+Usar models to represent selection-list options (e.g., like a drop down list of choices), rather than hard coding the choices into the website itself
 
 Django allows you to define relationships that are one to one (OneToOneField), one to many (ForeignKey) and many to many (ManyToManyField)
     (*) genre = models.ManyToManyField(Genre, help_text="Select a genre for this book")
@@ -303,6 +335,7 @@ Las variables de la clase son los atributos en la base de datos, declarar uno:
         choices
             Lista de key/value pairs
             The value in a key/value pair is a display value that a user can select, while the keys are the values that are actually saved if the option is selected
+            Django automatically creates a method get_foo_display() for every choices field foo in a model, which can be used to get the current value of the field
     Field types: [lista completa](https://docs.djangoproject.com/en/5.0/ref/models/fields/#field-types)
         CharField
         TextField
@@ -362,6 +395,12 @@ Book.objects.all()
 # We use the format field_name__match_type
 wild_books = Book.objects.filter(title__contains='wild')
 number_wild_books = wild_books.count()
+
+# assuming book is a record of a book
+
+# Te devuelve todos los records de BookInstance que tienen como foreignKey a book
+    # the function is created by lower-casing the model name where the ForeignKey was declared, followed by _set
+book.bookinstance_set.all()
 ```
 
 ### Usar los modelos
