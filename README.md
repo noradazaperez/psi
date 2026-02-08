@@ -1,4 +1,4 @@
-Llegado hasta for loops y condicionales en el tutorial parte 6
+Apuntes hasta automagically
 
 # psi
 
@@ -40,3 +40,6 @@ No sé qué significa "number of books that contain a particular word"
     psycopg2-binary==2.9.10
     - En el original el # está swapped
     - Si no, no me compila porq no tengo los ficheros de C necesarios
+- Creo q uno de los tests está mal, lo he cambiado a:
+    result = finders.find('css/style.css')
+    (le he quitado la 's' al final de style)

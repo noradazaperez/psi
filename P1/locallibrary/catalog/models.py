@@ -64,6 +64,9 @@ class Book(models.Model):
         return ', '.join(genre.name for genre in self.genre.all()[:3])
 
     display_genre.short_description = 'Genre'
+
+    class Meta:
+        ordering = ['title']
     
 import uuid # Required for unique book instances
 
@@ -117,6 +120,9 @@ class Author(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return f'{self.last_name}, {self.first_name}'
+    
+    class Meta:
+        ordering = ['last_name']
 
 # Added code
 

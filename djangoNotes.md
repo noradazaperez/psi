@@ -78,13 +78,35 @@ Redirecting
         path('', RedirectView.as_view(url='catalog/', permanent=True)),
     ]
 
-Note: The route in path() is a string defining a URL pattern to match. This string might include a named variable (in angle brackets), e.g., 'catalog/<id>/'. This pattern will match a URL like catalog/any_chars/ and pass any_chars to the view as a string with the parameter name id
+NOTA: existe una función re_path que te permite matchear la url con regex
+    (*)re_path(r'^book/(?P<pk>\d+)$', views.BookDetailView.as_view(), name='book-detail'),
+    Todas las variables se pasarán como strings
+    Regex in python intro:
+| Symbol 	    | Meaning |
+|---------------|---------|
+| ^ 	        | Match the beginning of the text
+| $ 	        | Match the end of the text
+| \d 	        | Match a digit (0, 1, 2, … 9)
+| \w 	        | Match a word character, e.g., any upper- or lower-case character in the alphabet, digit or the underscore character (_)
+| + 	        | Match one or more of the preceding character. For example, to match one or more digits you would use \d+. To match one or more "a" characters, you could use a+
+| * 	        | Match zero or more of the preceding character. For example, to match nothing or a word you could use \w*
+| ( ) 	        | Capture the part of the pattern inside the parentheses. Any captured values will be passed to the view as unnamed parameters (if multiple patterns are captured, the associated parameters will be supplied in the order that the captures were declared).
+| (?P<name>...) | Capture the pattern (indicated by ...) as a named variable (in this case "name"). The captured values are passed to the view with the name specified. Your view must therefore declare a parameter with the same name!
+| [ ] 	        | Match against one character in the set. For example, [abc] will match on 'a' or 'b' or 'c'. [-\w] will match on the '-' character or any word character. 
 
 ### path
 El primer parámetro es la dirección en el link
+    it is a string defining a URL pattern to match.
+    This string might include a named variable (in angle brackets), e.g., 'catalog/<id>/'. This pattern will match a URL like catalog/any_chars/ and pass any_chars to the view as a string with the parameter name id
+        También puedes especificar el tipo de dato like so:
+        'catalog/<int:id>'
+        El nombre dado a la variable es el que el class_based view se esperará. i.e. si lo quieres usar, tienes q llamarlo id
+            Si escribes tu propia función no hace falta
 El segundo parámetro es la función que habría que llamar
     Normalmente, empezará con views. al estár la función contenida en el archivo views (views.¡tu función!)
-El tercer parámetro es el nombre de este mapping particular
+El tercer parámetro es un diccionario que pasará al view
+    Se pasará como argumento con nombre, a no ser que una variable del link tenga el mismo nombre que una del diccionario. En ese caso se pasará el diccionario
+El name parameter es el nombre de este mapping particular
     You can use the name to "reverse" the mapper
         i.e., to dynamically create a URL that points to the resource that the mapper is designed to handle
     (*) <a href="{% url 'index' %}">Home</a>.
@@ -92,6 +114,11 @@ El tercer parámetro es el nombre de este mapping particular
         
 
 ## views.py
+Useful function:
+    get_object_or_404()
+        Está en django.shortcuts
+        (*) book = get_object_or_404(Book, pk=primary_key)
+
 The render() function accepts the following parameters:
 - the original request object, which is an HttpRequest.
 - an HTML template with placeholders for the data.
@@ -136,12 +163,25 @@ Métodos que se pueden sobreescribir:
         context['some_data'] = 'This is just some data'
         return context
         ```
+**DetailView**
+```python
+from django.views import generic
+
+class BookDetailView(generic.DetailView):
+    model = Book
+``` 
+    automáticamente asume que el parámetro pasado es el pk de un record del modelo
+    El template debería llamarse: /¡application_name!/¡the_model_name!_detail.html
+    El objeto específico consultado se llamará ¡the_model_name!
 
 ### Templates
 
 Si la app se ha generado con startapp el programa se esperará que los templates estén en la carpeta ¡nombre aplicación!/templates
 
-variables are enclosed in double braces (*) {{ num_books }}
+variables are enclosed in double braces
+    (*) {{ num_books }}
+    También puedes acceder a los subelementos de la variable con punto (*) {{ book.author }}
+    Esto también te permite llamar a métodos pero <(*)>, no puedes pasarle argumentos a los métodos
 tags are enclosed in single braces with percentage signs (*) {% extends "base_generic.html" %}
 
 Cargar contenido estático
@@ -158,16 +198,49 @@ Añadir links a otras páginas de tu proyecto
     No olvidar las comitas después del url!!!
     Para pasarle argumentos es:
         <a href="{% url '¡nombre del mapping!' '¡argumento 1!' %}"> ¡Display word del link!</a>
-fors con listas 
+
+**Programación en templates**
+if
 ```html
-    <ul>
-      {% for book in book_list %}
-      <li>
+    {% if ¡condición! %}
+    <!-- ¡lo q quieras! -->
+    {% elif ¡condición! %}
+    <!-- ¡lo q quieras! -->
+    {% else %}
+    <!-- ¡lo q quieras! -->
+    {% endif %}
+```
+    Condición puede ser una variable que quieres comprobar si está vacía o definida
+
+for
+```html
+    {% for ¡nombre! in ¡lista! %}
+    <!-- ¡lo q quieras! -->
+    {% endfor %}
+```
+    También puedes añadir una cláusula empty
+```html
+    {% for ¡nombre! in ¡lista! %}
+        <!-- code here -->
+    {% empty %}
+        <!-- código que se ejecutará sólo si la lista es vacía -->
+    {% endfor %}
+```
+    Otros elementos útiles:
+        forloop.last
+            El último elemento q ha procesado el bucle, es una variable
+    Ejemplo de for con listas:
+```html 
+<ul>
+  {% for book in book_list %}
+    <li>
         <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
         ({{book.author}})
-      </li>
-      {% endfor %}
-    </ul>
+    </li>
+  {% empty %}
+    <p>There are no books in the library.</p>
+  {% endfor %}
+</ul>
 ```
 
 **Configurar**
