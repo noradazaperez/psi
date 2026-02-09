@@ -24,6 +24,16 @@ cd locallibrary
 
 ## Base de datos
 
+    En el archivo settings.py
+    ```
+    import dj_database_url
+    db_from_env =
+    dj_database_url.config(default=’postgres://alumnodb:alumnodb@localhost:5432/psi’,
+    conn_max_age=500)
+    DATABASES[’default’].update(db_from_env)
+
+    ```
+
     Para crear la base de datos:
     ```bash
     createdb -U alumnodb -h localhost psi
@@ -34,6 +44,7 @@ cd locallibrary
     dropdb -U alumnodb -h localhost psi
 
     ```
+
 
     * modelos 
         * clase en django que será una tabla en la base de datos
