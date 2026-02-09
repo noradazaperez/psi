@@ -67,7 +67,7 @@ class SecondWeekTests(TestCase):
 
 
     def test_static_file_css(self):
-        result = finders.find('css/style.css')
+        result = finders.find('css/styles.css')
         self.assertIsNotNone(result)
 
 

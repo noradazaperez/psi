@@ -202,6 +202,16 @@ Añadir links a otras páginas de tu proyecto
     Para pasarle argumentos es:
         <a href="{% url '¡nombre del mapping!' '¡argumento 1!' %}"> ¡Display word del link!</a>
 
+usos chulos
+    {{ ¡variable numérica!|pluralize }}
+        Te devolverá s si la variable numérica es mayor que 1. Sirve para por ejemplo you have visited the site 0 times o 1 time
+
+    {{ user.is_authenticated }}
+        Verdadero si el usuario está autenticado
+        En general, user tiene toda la información del usuario
+
+    
+
 **Programación en templates**
 if
 ```html
@@ -421,6 +431,204 @@ Filtros:
         gt (greater than)
         startswith
 
+## Manejo de sesiones
+
+Según nuestro setup ya hay manejo de sesiones, pero lo q hay q cambiar es, en settings.py (el del proyecto, no la app):
+```python
+INSTALLED_APPS = [
+    # …
+    'django.contrib.sessions',
+    # …
+
+MIDDLEWARE = [
+    # …
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    # …
+```
+
+```python
+# Get a session value by its key (e.g. 'my_car'), raising a KeyError if the key is not present
+my_car = request.session['my_car']
+
+# Get a session value, setting a default if it is not present ('mini')
+my_car = request.session.get('my_car', 'mini')
+
+# Set a session value
+request.session['my_car'] = 'mini'
+
+# Delete a session value
+del request.session['my_car']
+
+# Session object not directly modified, only data within the session. Session changes not saved!
+request.session['my_car']['wheels'] = 'alloy'
+
+# Set session as modified to force data updates/cookie to be saved.
+request.session.modified = True
+```
+
+Si quieres forzar a q updatee la sesión tras cada cambio, en settings.py del proyecto añadir SESSION_SAVE_EVERY_REQUEST = True
+
+## usuarios
+
+Según nuestro setup ya tenemos las cosas preparadas para manejar usuarios, pero lo q hay q cambiar es, en settings.py (el del proyecto, no la app):
+```python
+INSTALLED_APPS = [
+    # …
+    'django.contrib.auth',  # Core authentication framework and its default models.
+    'django.contrib.contenttypes',  # Django content type system (allows permissions to be associated with models).
+    # …
+
+MIDDLEWARE = [
+    # …
+    'django.contrib.sessions.middleware.SessionMiddleware',  # Manages sessions across requests
+    # …
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Associates users with requests using sessions.
+    # …
+```
+
+Para crear un usuario en con código:
+```python
+from django.contrib.auth.models import User
+
+# Create user and save to the database
+user = User.objects.create_user('myusername', 'myemail@crazymail.com', 'mypassword')
+
+# Update fields and then save again
+user.first_name = 'Tyrone'
+user.last_name = 'Citizen'
+user.save()
+```
+
+Si tienes tu propio modelo de usuario es:
+```python 
+# Get current user model from settings
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+# Create user from model and save to the database
+user = User.objects.create_user('myusername', 'myemail@crazymail.com', 'mypassword')
+
+# Update fields and then save again
+user.first_name = 'Tyrone'
+user.last_name = 'Citizen'
+user.save()
+```
+
+**views.py** 
+
+Para que se requiera el login en una función que sea un view 
+    Poner @login_required delante de la función 
+
+Si es un class-based view:
+
+```python
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+class MyView(LoginRequiredMixin, View):
+    # …
+```
+    Puedes añadir login_url para decir el url al que serán redirigidos para q inicien sesión 
+    También hay redirect_field_name que será el nombre que le pondrán al parámetro 'next' en la url del login 
+
+Para acceder al modelo de usuario usado puedes verlo en settings.py, tienes que:
+```python
+from django.conf import settings
+
+# Ahora en user model está el modelo que se usan para los usuarios
+user_model = settings.AUTH_USER_MODEL
+```
+
+django te maneja la redirección de urls automáticamente si añades:
+```python
+# Add Django site authentication urls (for login, logout, password management)
+
+urlpatterns += [
+    path('accounts/', include('django.contrib.auth.urls')),
+]
+```
+
+Te añadirá los mapeos para los siguientes links:
+accounts/ login/ [name='login']   ----> login.html
+accounts/ logout/ [name='logout'] ----> logged_out.html
+accounts/ password_change/ [name='password_change']
+accounts/ password_change/done/ [name='password_change_done']
+accounts/ password_reset/ [name='password_reset'] ----> password_reset_form.html
+    También tendrás que crear password_reset_email.html con el contenido del email para resettear la contraseña que se les mandará
+accounts/ password_reset/done/ [name='password_reset_done'] ----> password_reset_done.html
+accounts/ reset/<uidb64>/<token>/ [name='password_reset_confirm'] ----> password_reset_confirm.html
+accounts/ reset/done/ [name='password_reset_complete'] ----> password_reset_complete.html
+
+Para cada uno de estos, se encarga también de las funciones view y todo. Lo que tienes que crear son los templates
+    Los buscará en la carpeta ¡nombre proyecto!/templates/¡registration! (OJO no en ¡nombre proyecto!/¡nombre proyecto!/templates/¡registration!)
+        Para ver el nombre del fichero, mirar la lista de arriba
+    Hay que incorporar esta carpeta de templates al path, hacerlo del siguiente modo:
+
+```python
+# Importar os si no está ya importado
+# …
+    TEMPLATES = [
+      {
+       # …
+       'DIRS': [os.path.join(BASE_DIR, 'templates')],
+       'APP_DIRS': True,
+       # …
+```
+
+Como nuestra app no manda emails, añadir a settings.py 
+```python
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+```
+    Te imprimirá los emails "mandados" por consola y así puedes obtener el link
+
+**login**
+Después del login, django lleva el usuario a /accounts/profile/. Si quieres q lleve a otro sitio modificar settings.py
+```Python
+# Redirect to home URL after login (Default redirects to /accounts/profile/)
+LOGIN_REDIRECT_URL = '/¡dirección!'
+```
+
+Ejemplo de form de login
+```html
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+  {% if form.errors %}
+    <p>Your username and password didn't match. Please try again.</p>
+  {% endif %}
+
+  {% if next %}
+    {% if user.is_authenticated %}
+      <p>Your account doesn't have access to this page. To proceed,
+      please login with an account that has access.</p>
+    {% else %}
+      <p>Please login to see this page.</p>
+    {% endif %}
+  {% endif %}
+
+  <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    <table>
+      <tr>
+        <td>{{ form.username.label_tag }}</td>
+        <td>{{ form.username }}</td>
+      </tr>
+      <tr>
+        <td>{{ form.password.label_tag }}</td>
+        <td>{{ form.password }}</td>
+      </tr>
+    </table>
+    <input type="submit" value="login">
+    <input type="hidden" name="next" value="{{ next }}">
+  </form>
+
+  {# Assumes you set up the password_reset view in your URLConf #}
+  <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+
+{% endblock %}
+```
+
+Al mandar al usuario a la página de login poner ?next={{ request.path }} al final del link. Así te aseguras de que les redirigen a la página donde estaban después del login
 
 # Bases de datos
 
