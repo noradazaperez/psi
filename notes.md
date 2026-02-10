@@ -196,3 +196,25 @@ cd locallibrary
 6. Environment 
     * Database_URL
     * SECRET_KEY DEBUG
+
+
+Antes de desplegar en Render
+
+* Fichero build.sh
+    En el script build.sh, que se encuentra en la ra´ız del proyecto, se pueden
+    a˜nadir todos los comandos necesarios para poblar la base de datos, etc. Por
+    otro lado, en el comando createsu que se ejecuta en el fichero script, se debe
+    indicar el usuario y contrase˜na ya indicados (alumnodb)
+    
+```bash
+    set -o errexit  # exit on error
+
+    pip install -r requirements.txt
+
+    python manage.py collectstatic --no-input
+    python manage.py migrate
+
+```
+
+
+* Database, from Render dashboard:
