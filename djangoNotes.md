@@ -376,6 +376,7 @@ class Meta: [todas las opciones](https://docs.djangoproject.com/en/5.0/ref/model
                 violation_error_message = "Genre already exists (case insensitive match)"
             ),
     ]
+    permissions = (("can_mark_returned", "Set book as returned"),)
 
 Métodos
     Minimally, in every model you should define the standard Python class method __str__() to return a human-readable string for each object. This string is used to represent individual records in the administration site (and anywhere else you need to refer to a model instance). Often this will return a title or name field from the model.

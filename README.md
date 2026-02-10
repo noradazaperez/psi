@@ -1,6 +1,7 @@
 # psi
 
 Dejado en la parte 8, justo encima de permissions
+Salto de la parte 8 a desplegarlo (parte 11)
 
 [Enlace tutorial django](http://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Server-side/Django)
 [Enlace repositorio profes](https://github.com/rmarabini/psi-alumnos/tree/2025-26/)
@@ -35,13 +36,6 @@ sudo systemctl restart postgresql
 
 - Soy incapaz de conectarme a la base de datos
     - sudo systemctl restart postgresql
-
-## Material al q tendremos acceso:
-    - Lo q hayamos subido a moodle
-        - Podemos añadir lo q queramos
-        - Su recomendación: resolver el examen y poner nuestra resolución en moodle
-
-## Pregs
 - He hecho lo siguiente a requirements.txt para q me funcione en local
     #psycopg2==2.9.10
     psycopg2-binary==2.9.10
@@ -58,3 +52,31 @@ sudo systemctl restart postgresql
     @ Sólo modificar las cosas que hayamos tocado (si es sólo una línea, sólo esa línea)
 - Necesidades especiales es en el 6a, ¿cuento yo?
     @ No cuento
+
+
+## Material al q tendremos acceso:
+    - Lo q hayamos subido a moodle
+        - Podemos añadir lo q queramos
+        - Su recomendación: resolver el examen y poner nuestra resolución en moodle
+
+## Desplegar, apuntes pizarra
+Render.com
+1. Acceso github
+2. Whitenoise / gunicorn
+    - Esto es para servir los ficheros estáticos 
+        - Meterlo en requirements.txt
+3. build.sh 
+    pip install -r requirements.txt 
+        Lo más importante
+4. Elegir esta opción en render: Web aplication
+5. gunicorn project.wsgi.application 
+
+6. environment
+        Para q no haya passwords en gh ni en el fichero de settings
+    DATABASE_URL 
+    DEBUG
+    SECRET_KEY
+        QUITARLA DE GH!!!!
+
+## Pregs
+
