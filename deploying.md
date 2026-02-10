@@ -2,7 +2,8 @@ He decidido dejar de tomar apuntes y sólo hacer para controlar los errores.
 NOTAS:
     https://testdriven.io/blog/django-render/
         Seguir este tutorial
-
+    En Render te definen RENDER_EXTERNAL_HOSTNAME
+        Es la mçazuqina doonde está corriendo en ese momento, para ALLOWED_HOSTS
 
 1. Cambiar variables de settings.py 
     - DEBUG = False

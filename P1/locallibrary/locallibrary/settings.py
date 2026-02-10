@@ -36,7 +36,11 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-&psk#na5l=p3q8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', '') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(' ')
+ALLOWED_HOSTS = []
+
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 
 # Application definition
@@ -97,16 +101,10 @@ DATABASES = {
 # Update database configuration from $DATABASE_URL environment variable (if defined)
 import dj_database_url
 
-if 'DATABASE_URL' in os.environ:
-    DATABASES['default'] = dj_database_url.config(
+DATABASES['default'] = dj_database_url.config(
         conn_max_age=500,
         conn_health_checks=True,
     )
-else:
-    db_from_env = dj_database_url.config(default='postgres://alumnodb:alumnodb@localhost:5432/psi', conn_max_age=500)
-
-    DATABASES['default'].update(db_from_env)
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
