@@ -1,3 +1,9 @@
+He decidido dejar de tomar apuntes y sólo hacer para controlar los errores.
+NOTAS:
+    https://testdriven.io/blog/django-render/
+        Seguir este tutorial
+
+
 1. Cambiar variables de settings.py 
     - DEBUG = False
     - SECRET_KEY
