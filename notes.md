@@ -186,5 +186,13 @@ cd locallibrary
     
     * Home Page:
     - URLs: Note: Whenever Django encounters the import function django.urls.include(), it splits the URL string at the designated end character and sends the remaining substring to the included URLConf module for further processing.
-    
-    
+
+**Despliegue** 
+1. Acceso Github
+2. Whitenoise/Gunicorn
+3. Build.sh -> pip install
+4. Web application
+5. Gunicorn Project.WSGI application
+6. Environment 
+    * Database_URL
+    * SECRET_KEY DEBUG
