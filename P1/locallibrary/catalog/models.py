@@ -1,8 +1,10 @@
 from django.db import models
 
-from django.urls import reverse  # Used in get_absolute_url() to get URL for specified ID
+# Used in get_absolute_url() to get URL for specified ID
+from django.urls import reverse
 
-from django.db.models import UniqueConstraint  # Constrains fields to unique values
+# Constrains fields to unique values
+from django.db.models import UniqueConstraint
 from django.db.models.functions import Lower  # Returns lower cased value of field
 
 from django.conf import settings
