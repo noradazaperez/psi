@@ -631,6 +631,56 @@ Ejemplo de form de login
 
 Al mandar al usuario a la página de login poner ?next={{ request.path }} al final del link. Así te aseguras de que les redirigen a la página donde estaban después del login
 
+### permisos 
+
+**Definirlos**
+En el meta de un modelo, puedes definir los permisos q van asociados al modelo en la clase Meta del modelo (los permisos relacionados con libros, en el meta del libro) like so:
+(*) permissions = (("can_mark_returned", "Set book as returned"),)
+    Cada tupla es un permiso
+        - El primer valor es nombre del permiso
+        - El segundo valor es el display name del permiso
+
+Automáticamente, django te define change, add and delete permissions para cada modelo 
+
+**Acceder a ellos**
+- Templates:
+    - Están guardados en una variable {{perms}}
+    - Para comprobar si un determinado usuario tiene un permiso, se puede comprobar así:
+        - {{ perms.¡nombre aplicación!.¡nombre permiso a comprobar! }}
+        - (*) {{ perms.catalog.can_mark_returned }}
+        - Puede ser verdadero o falso, y se puede comprobar en un if
+- Views:
+    - Si es una función:
+        Usar el decorador:
+        ```python 
+        from django.contrib.auth.decorators import permission_required
+
+        @permission_required('catalog.can_mark_returned')
+        @permission_required('catalog.can_edit')
+        def my_view(request):
+            # …
+        ```
+        NOTA: con esta configuración, si un usuario que ha iniciado sesión intenta acceder a la página, le devolverán HTTP 302, pero lo deseable sería que le devolvieran HTTP 403. Para q devuelvan 403:
+        ```python 
+        from django.contrib.auth.decorators import login_required, permission_required
+
+        @login_required
+        @permission_required('catalog.can_mark_returned', raise_exception=True)
+        def my_view(request):
+            # …
+        ```
+    - Si es un class_based view:
+    ```python 
+    from django.contrib.auth.mixins import PermissionRequiredMixin
+
+    class MyView(PermissionRequiredMixin, View):
+        permission_required = 'catalog.can_mark_returned'
+        # Or multiple permissions
+        permission_required = ('catalog.can_mark_returned', 'catalog.change_book')
+        # Note that 'catalog.change_book' is permission
+        # Is created automatically for the book model, along with add_book, and delete_book
+    ```
+
 # Bases de datos
 
 Una vez instaladas las dependencias, se debe modificar la variable DATABASES del fichero settings.py de la siguiente manera:

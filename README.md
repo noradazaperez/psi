@@ -1,7 +1,22 @@
 # psi
 
-Dejado en la parte 8, justo encima de permissions
-Salto de la parte 8 a desplegarlo (parte 11)
+Dejado en la parte 8 en el challenge yourself:
+    - Me falta por añadir la subsección "Staff" en el índice, debajo del user.is_authenticated
+    (debajo de esto):
+    {% if user.is_authenticated %}
+        <li>User: {{ user.get_username }}</li>
+        <li>
+        <form id="logout-form" method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-link">Logout</button>
+        </form>
+        </li>
+        <li><a href="{% url 'my-borrowed' %}">My Borrowed</a></li>
+    {% else %}
+        <li><a href="{% url 'login' %}?next={{ request.path }}">Login</a></li>
+    {% endif %}
+    - Comprobar que he creado el tipo de usuario "Staff" o "librarian"
+            
 
 [Enlace tutorial django](http://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Server-side/Django)
 [Enlace repositorio profes](https://github.com/rmarabini/psi-alumnos/tree/2025-26/)
