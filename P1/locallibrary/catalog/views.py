@@ -73,6 +73,7 @@ class LoanedBooksAllListView(PermissionRequiredMixin, generic.ListView):
     """Generic class-based view listing books on loan to current user."""
     model = BookInstance
     template_name = 'catalog/bookinstance_list_borrowed.html'
+    permission_required = 'catalog.can_mark_returned'
     paginate_by = 10
 
     def get_queryset(self):
