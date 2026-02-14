@@ -681,6 +681,231 @@ Automáticamente, django te define change, add and delete permissions para cada 
         # Is created automatically for the book model, along with add_book, and delete_book
     ```
 
+## Forms 
+
+### Creación
+La información de los formularios se debe guardar en un archivo forms.py, dentro de la aplicación pertinente
+
+Ejemplo básico
+```python
+from django import forms
+
+class RenewBookForm(forms.Form):
+    renewal_date = forms.DateField(help_text="Enter a date between now and 4 weeks (default 3).")
+```
+El nombre de cada campo será la textificación del nombre en el formulario
+    (*) en este caso, el nombre que aparecerá será Renewal date:
+
+Tipos de campos principales:
+    - BooleanField
+    - CharField
+    - ChoiceField
+    - TypedChoiceField
+    - DateField
+    - DateTimeField
+    - DecimalField
+    - DurationField
+    - EmailField
+    - FileField
+    - FilePathField
+    - FloatField
+    - ImageField
+    - IntegerField
+    - GenericIPAddressField
+    - MultipleChoiceField
+    - TypedMultipleChoiceField
+    - NullBooleanField
+    - RegexField
+    - SlugField
+    - TimeField
+    - URLField
+    - UUIDField
+    - ComboField
+    - MultiValueField
+    - SplitDateTimeField
+    - ModelMultipleChoiceField
+    - ModelChoiceField
+
+Principales parámetros q puede tener un campo:
+    - required
+        - If true, no se permite q se deje en blanco o null
+        - Por defecto, será true 
+    - label
+        - the label to use when rendering the field in HTML
+    - label_suffix
+        - By default, a colon is displayed after the label (e.g., Renewal date​:). This argument allows you to specify a different suffix containing other character(s)
+    - initial
+        - The initial value for the field when the form is displayed.
+    - help_text
+        - Additional text that can be displayed in forms to explain how to use the field
+    - error_messages
+        - A list of error messages for the field
+    - validators
+        - A list of functions that will be called on the field when it is validated
+    - disabled
+        - The field is displayed but its value cannot be edited if this is True. The default is False
+
+**A partir de un modelo**
+```python
+from django.forms import ModelForm
+
+from catalog.models import BookInstance
+
+class RenewBookModelForm(ModelForm):
+    class Meta:
+        model = BookInstance
+        fields = ['due_back']
+```
+Para especificar los campos, también se puede poner:
+        No se recomienda hacerlo así porque, si añades campos, se agregan automáticamente al formulario sin que el developer lo haya pensado
+    fields = '__all__'
+        Incluye todos los campos
+    exclude = []
+        Incluye todos los campos salvo los de la lista en exclude 
+
+Para ajustar cómo se muestran los campos:
+```python
+class Meta:
+    model = BookInstance
+    fields = ['due_back']
+    labels = {'due_back': _('New renewal date')}
+    help_texts = {'due_back': _('Enter a date between now and 4 weeks (default 3).')}
+```
+
+**Validación**
+The easiest way to validate a single field is to override the method clean_¡field_name!()
+        Esto sirve para forms a partir de modelos y los hechos a pelo
+Uso:
+    - Para obtener la información a validar hay que coger el valor en self.cleaned_data['¡nombre del campo!']
+    - Hay q devolver el campo al final de la función (aún si no lo hemos cambiado)
+    - Si algún dato no verifica las restricciones, hay que raise a ValidationError like so:
+        ```python
+            if data < datetime.date.today():
+                raise ValidationError('Invalid date - renewal in past')
+        ```
+        - En el error se pone el mensaje que queremos que se muestre
+        - Si quieres traducir la página, está bien pasar el texto por un gettext_lazy
+        ```python
+        from django.utils.translation import gettext_lazy as _
+        
+        if data < datetime.date.today():
+            raise ValidationError(_('Invalid date - renewal in past'))
+        ```
+
+### Uso en views.py 
+Para comprobar si es la primera vez q se accede al form, comprobar el method
+
+Pasos generales:
+```python
+
+from catalog.forms import RenewBookForm
+
+def renew_book_librarian(request, pk):
+    book_instance = get_object_or_404(BookInstance, pk=pk)
+
+    # If this is a POST request then process the Form data
+    if request.method == 'POST':
+
+        # Create a form instance and populate it with data from the request (binding):
+        form = RenewBookForm(request.POST)
+
+        # Check if the form is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
+            book_instance.due_back = form.cleaned_data['renewal_date']
+            book_instance.save()
+
+            # redirect to a new URL:
+            return HttpResponseRedirect(reverse('all-borrowed'))
+
+    # If this is a GET (or any other method) create the default form.
+    else:
+        proposed_renewal_date = datetime.date.today() + datetime.timedelta(weeks=3)
+        form = RenewBookForm(initial={'renewal_date': proposed_renewal_date})
+
+    context = {
+        'form': form,
+        'book_instance': book_instance,
+    }
+
+    return render(request, 'catalog/book_renew_librarian.html', context)
+```
+
+También existe una clase [Form view](https://docs.djangoproject.com/en/5.0/ref/class-based-views/generic-editing/#formview)
+
+Además, existen clases que te ayudan a crear formularios de crear, editar o eliminar:
+```python
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from .models import Author
+
+class AuthorCreate(PermissionRequiredMixin, CreateView):
+    model = Author
+    fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death']
+    initial = {'date_of_death': '11/11/2023'}
+    permission_required = 'catalog.add_author'
+    template_name_suffix = "_formulario" # Cambiar el nombre que se esperarán en el template
+
+class AuthorUpdate(PermissionRequiredMixin, UpdateView):
+    model = Author
+    # Not recommended (potential security issue if more fields added)
+    fields = '__all__'
+    permission_required = 'catalog.change_author'
+
+class AuthorDelete(PermissionRequiredMixin, DeleteView):
+    model = Author
+    success_url = reverse_lazy('authors')
+    permission_required = 'catalog.delete_author'
+
+    def form_valid(self, form):
+        try:
+            self.object.delete()
+            return HttpResponseRedirect(self.success_url)
+        # Esto se ha añadido porq borrar un autor no es siempre successful, y así se define qué hacer en caso de que falle
+        except Exception as e:
+            return HttpResponseRedirect(
+                reverse("author-delete", kwargs={"pk": self.object.pk})
+            )
+```
+
+Automáticamente, después de estos formularios, se conduce al usuario a una página con la info específica del record cambiado (usando el reverse, asumo)
+    Si quieres cambiar el lugar donde se lleva, puedes definir el parámetro success_url
+De manera predeterminada, el de crear y update usarán el mismo template, que debería estar en: ¡app!/¡templates!/¡app!/¡nombre del modelo!_form.html
+
+The "delete" view expects to find a template named with the format [model_name]_confirm_delete.html 
+    (again, you can change the suffix using template_name_suffix in your view)
+    Debería incluir un form ahí similar a este:
+    ```html
+        <form action="" method="POST">
+            {% csrf_token %}
+            <input type="submit" action="" value="Yes, delete.">
+        </form>
+    ```
+
+### Uso en templates
+
+```html 
+  <form action="" method="post">
+    {% csrf_token %}
+    <table>
+    {{ form.as_table }}
+    </table>
+    <input type="submit" value="Submit">
+  </form>
+```
+
+Acceder a las opciones de un campo específico:
+- {{ form.renewal_date }}: The whole field.
+- {{ form.renewal_date.errors }}: The list of errors.
+- {{ form.renewal_date.id_for_label }}: The id of the label.
+- {{ form.renewal_date.help_text }}: The field help text
+
+**Otras opciones de renderización**
+as a list {{ form.as_ul }}
+as a paragraph {{ form.as_p }}
+
+
+
 # Bases de datos
 
 Una vez instaladas las dependencias, se debe modificar la variable DATABASES del fichero settings.py de la siguiente manera:
@@ -795,3 +1020,22 @@ django.core.exceptions.ImproperlyConfigured: Requested setting INSTALLED_APPS, b
     
     Acceder al shell
         python3 manage.py shell
+
+# html
+
+Ejemplo de form
+```html
+<form action="/team_name_url/" method="post">
+  <label for="team_name">Enter name: </label>
+  <input
+    id="team_name"
+    type="text"
+    name="name_field"
+    value="Default name for team." />
+  <input type="submit" value="OK" />
+</form>
+```
+Submit sube toda la información de todos los campos. Por defecto, será un botón
+Action es el link al q subirán la información
+Method es cómo se subirán los datos
+    Poner siempre POST, a no ser q la información no edite nada del servidor y quieres q sea un resultado compartible (*) una búsqueda
