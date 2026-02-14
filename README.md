@@ -1,5 +1,5 @@
 # psi
-            
+Parte 9, generic editing views, justo antes de añadir los menus al sidebar
 
 [Enlace tutorial django](http://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Server-side/Django)
 [Enlace repositorio profes](https://github.com/rmarabini/psi-alumnos/tree/2025-26/)
