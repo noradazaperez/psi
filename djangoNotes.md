@@ -1,0 +1,1047 @@
+## venv
+
+python3 -m venv p1_env; source p1_env/bin/activate
+pip3 install -r P1/requirements.txt
+
+## Setup
+1. Create proyect
+```bash
+django-admin startproject locallibrary
+cd locallibrary
+```
+2. Create app 
+```bash
+python3 manage.py startapp catalog
+```
+
+3. Add app to proyect:
+    
+    3.1. In settings.py of the proyect folder
+```python
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    # Add our new application
+    'catalog.apps.CatalogConfig', # This object was created for us in /catalog/apps.py
+]
+```
+
+4. Manage database
+```bash
+python3 manage.py makemigrations
+python3 manage.py migrate
+```
+
+5. Run the developement server
+```bash
+python3 manage.py runserver
+```
+
+6. Ver sección de bases de datos para ver cómo cambiarla a usar postgre y usuarios y etc
+
+7. Configurar el servido de archivos estáticos
+    
+    7.1. Make sure that django.contrib.staticfiles is included in your INSTALLED_APPS.
+
+    7.2. In your settings file , define STATIC_URL. Es la dirección relativa desde la carpeta donde está la app
+
+    7.3. Para usarlo en los templates:
+```HTML
+<!-- Add additional CSS in static file -->
+{% load static %}
+<link rel="stylesheet" href="{% static '¡dirección desde la carpeta configurada con STATIC_URL al archivo!' %}" />
+```
+
+        - La primera fila carga el tag static
+        - La segunda es cómo usarla dentro del archivo
+
+
+## urls.py
+Resumen: 
+
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLConf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+        Dentro de blog/urls.py los links empezarán con blog/ (i.e. si en blog/urls.py tengo path('hello/', ...), se referirá a los links localhost/blog/hello)
+Redirecting
+    urlpatterns += [
+        path('', RedirectView.as_view(url='catalog/', permanent=True)),
+    ]
+
+NOTA: existe una función re_path que te permite matchear la url con regex
+    (*)re_path(r'^book/(?P<pk>\d+)$', views.BookDetailView.as_view(), name='book-detail'),
+    Todas las variables se pasarán como strings
+    Regex in python intro:
+| Symbol 	    | Meaning |
+|---------------|---------|
+| ^ 	        | Match the beginning of the text
+| $ 	        | Match the end of the text
+| \d 	        | Match a digit (0, 1, 2, … 9)
+| \w 	        | Match a word character, e.g., any upper- or lower-case character in the alphabet, digit or the underscore character (_)
+| + 	        | Match one or more of the preceding character. For example, to match one or more digits you would use \d+. To match one or more "a" characters, you could use a+
+| * 	        | Match zero or more of the preceding character. For example, to match nothing or a word you could use \w*
+| ( ) 	        | Capture the part of the pattern inside the parentheses. Any captured values will be passed to the view as unnamed parameters (if multiple patterns are captured, the associated parameters will be supplied in the order that the captures were declared).
+| (?P<name>...) | Capture the pattern (indicated by ...) as a named variable (in this case "name"). The captured values are passed to the view with the name specified. Your view must therefore declare a parameter with the same name!
+| [ ] 	        | Match against one character in the set. For example, [abc] will match on 'a' or 'b' or 'c'. [-\w] will match on the '-' character or any word character. 
+
+### path
+El primer parámetro es la dirección en el link
+    it is a string defining a URL pattern to match.
+    This string might include a named variable (in angle brackets), e.g., 'catalog/<id>/'. This pattern will match a URL like catalog/any_chars/ and pass any_chars to the view as a string with the parameter name id
+        También puedes especificar el tipo de dato like so:
+        'catalog/<int:id>'
+        El nombre dado a la variable es el que el class_based view se esperará. i.e. si lo quieres usar, tienes q llamarlo id
+            Si escribes tu propia función no hace falta
+El segundo parámetro es la función que habría que llamar
+    Normalmente, empezará con views. al estár la función contenida en el archivo views (views.¡tu función!)
+El tercer parámetro es un diccionario que pasará al view
+    Se pasará como argumento con nombre, a no ser que una variable del link tenga el mismo nombre que una del diccionario. En ese caso se pasará el diccionario
+El name parameter es el nombre de este mapping particular
+    You can use the name to "reverse" the mapper
+        i.e., to dynamically create a URL that points to the resource that the mapper is designed to handle
+    (*) <a href="{% url 'index' %}">Home</a>.
+        El link que quedará guardado al lado de href es el que apunta a la función a la que apunte el mapping llamado index
+        
+
+## views.py
+Useful function:
+    get_object_or_404()
+        Está en django.shortcuts
+        (*) book = get_object_or_404(Book, pk=primary_key)
+
+The render() function accepts the following parameters:
+- the original request object, which is an HttpRequest.
+- an HTML template with placeholders for the data.
+- a context variable, which is a Python dictionary, containing the data to insert into the placeholders.
+
+### Useful generic classes for views
+**ListView**
+```python
+from django.views import generic
+
+class BookListView(generic.ListView):
+    model = Book
+```
+
+The generic view will query the database to get all records for the specified model (Book) then render a template located at /¡application_name!/¡the_model_name!_list.html inside the application's /¡application_name!/templates/ directory (in this case /catalog/templates/catalog/book_list.html).
+
+Within the template you can access the list of books with the template variable named object_list OR  ¡the model name!_list.
+
+Atributos q se pueden añadir:
+    context_object_name  
+        Nombre de la variable con los objetos q se pasará al template
+    queryset
+        Lista de elementos que se pasará al template
+        (*) queryset = Book.objects.filter(title__icontains='war')[:5] # Get 5 books containing the title war
+    template_name 
+        Especificar el nombre del template y su localización
+    paginate_by
+        Especificar el número de records que habrá por página si se pagina
+        OJO! Si vas a paginar tiene q haber un orden definiod a la clase
+
+Métodos que se pueden sobreescribir:
+    get_queryset(self)
+        Debe retornar la lista que quieres que se pase al template
+    get_context_data(self, **kwargs)
+        Para pasarle más información al template
+        Hace falta seguir el siguiente proceso:
+            First get the existing context from our superclass. 
+            Then add your new context information.
+            Then return the new (updated) context.
+        (*)
+        ```python
+        # Call the base implementation first to get the context
+        context = super(BookListView, self).get_context_data(**kwargs)
+        # Create any data and add it to the context
+        context['some_data'] = 'This is just some data'
+        return context
+        ```
+**DetailView**
+```python
+from django.views import generic
+
+class BookDetailView(generic.DetailView):
+    model = Book
+``` 
+    automáticamente asume que el parámetro pasado es el pk de un record del modelo
+    El template debería llamarse: /¡application_name!/¡the_model_name!_detail.html
+    El objeto específico consultado se llamará ¡the_model_name!
+
+### Templates
+
+Si la app se ha generado con startapp el programa se esperará que los templates estén en la carpeta ¡nombre aplicación!/templates
+
+variables are enclosed in double braces
+    (*) {{ num_books }}
+    También puedes acceder a los subelementos de la variable con punto (*) {{ book.author }}
+    Esto también te permite llamar a métodos pero <(*)>, no puedes pasarle argumentos a los métodos
+tags are enclosed in single braces with percentage signs (*) {% extends "base_generic.html" %}
+
+Cargar contenido estático
+    Within the template you first call the load template tag specifying "static" to add the template library. 
+    You can then use the static template tag and specify the relative URL to the required file.
+    <!-- Add additional CSS in static file -->
+    {% load static %} 
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+Añadir comentarios
+    {# ¡comentario! #}
+Añadir links a otras páginas de tu proyecto
+    <a href="{% url '¡nombre del mapping!' %}"> ¡Display word del link!</a>
+    Ver la sección path, el tercer argumento, para el nombre del mapping
+    No olvidar las comitas después del url!!!
+    Para pasarle argumentos es:
+        <a href="{% url '¡nombre del mapping!' '¡argumento 1!' %}"> ¡Display word del link!</a>
+
+usos chulos
+    {{ ¡variable numérica!|pluralize }}
+        Te devolverá s si la variable numérica es mayor que 1. Sirve para por ejemplo you have visited the site 0 times o 1 time
+
+    {{ user.is_authenticated }}
+        Verdadero si el usuario está autenticado
+        En general, user tiene toda la información del usuario
+
+    
+
+**Programación en templates**
+if
+```html
+    {% if ¡condición! %}
+    <!-- ¡lo q quieras! -->
+    {% elif ¡condición! %}
+    <!-- ¡lo q quieras! -->
+    {% else %}
+    <!-- ¡lo q quieras! -->
+    {% endif %}
+```
+    Condición puede ser una variable que quieres comprobar si está vacía o definida
+
+for
+```html
+    {% for ¡nombre! in ¡lista! %}
+    <!-- ¡lo q quieras! -->
+    {% endfor %}
+```
+    También puedes añadir una cláusula empty
+```html
+    {% for ¡nombre! in ¡lista! %}
+        <!-- code here -->
+    {% empty %}
+        <!-- código que se ejecutará sólo si la lista es vacía -->
+    {% endfor %}
+```
+    Otros elementos útiles:
+        forloop.last
+            El último elemento q ha procesado el bucle, es una variable
+    Ejemplo de for con listas:
+```html 
+<ul>
+  {% for book in book_list %}
+    <li>
+        <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+        ({{book.author}})
+    </li>
+  {% empty %}
+    <p>There are no books in the library.</p>
+  {% endfor %}
+</ul>
+```
+
+**Configurar**
+Se hace cambiando la variable TEMPLATES de settings.py
+    DIRS 
+        Modificando esta variable se pueden especificar otras carpetas donde encontrar templates
+    APP_DIRS
+        Cuando es True le dice a django que busque templates dentro de una carpeta templates dentro de cada aplicación y no sólo en la carpeta grande del proyecto
+
+
+**Herencia de clases**
+Un template padre puede tener bloques que los templates hijos modifiquen. 
+
+Los bloques tienen esta estructura:
+    ```html
+    {% block ¡nombre del bloque! %}
+    ¡Código default que tendrá el bloque si los hijos no lo modifican!
+    {% endblock %}
+    ```
+    Estos bloques pueden estar dentro de títulos y etc
+
+Para heredar de otro archivo
+    ```html
+    {% extends "¡nombre del archivo terminando en .html!" %}
+    ```
+
+Para sobreescribir un bloque, es igual que declararlo, añadiendo los tags de block y endblock con el nombre
+
+    Para acceder al bloque padre puedes añadir {{ block.super }}
+
+**paginación**
+OJO: cuando paginas, la clase paginada tiene que tener un órden definido o django se vuelve loco (error)
+    Soluciones:
+        Añadir un orden el el META de la clase
+        Add a queryset attribute in your custom class-based view, specifying an order_by()
+        Adding a get_queryset method to your custom class-based view and also specify the order_by()
+
+El view necesita ser modificado para tener un paginate_by parámetro
+Usar: ponerlo justo después del block a paginar
+```html
+{% block pagination %}
+    {% if is_paginated %}
+        <div class="pagination">
+            <span class="page-links">
+                {% if page_obj.has_previous %}
+                    <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">previous</a>
+                {% endif %}
+                <span class="page-current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+                {% if page_obj.has_next %}
+                    <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">next</a>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+  {% endblock %}
+```
+
+## models
+
+Usar models to represent selection-list options (e.g., like a drop down list of choices), rather than hard coding the choices into the website itself
+
+Django allows you to define relationships that are one to one (OneToOneField), one to many (ForeignKey) and many to many (ManyToManyField)
+    (*) genre = models.ManyToManyField(Genre, help_text="Select a genre for this book")
+    (*) author = models.ForeignKey('Author', on_delete=models.RESTRICT, null=True)
+        You must use the name of the model as a string if the associated class has not yet been defined in this file before it is referenced!
+    By default on_delete=models.CASCADE, which means that if the author was deleted, this book would be deleted too! We use RESTRICT here, but we could also use PROTECT to prevent the author being deleted while any book uses it or SET_NULL to set the book's author to Null if the record is deleted.
+
+Las variables de la clase son los atributos en la base de datos, declarar uno:
+    (*) my_field_name = models.CharField(max_length=20, help_text='Enter field documentation')
+    The order that fields are declared will affect their default order if a model is rendered in a form
+    Possible parameters:
+        max_length
+        help_text
+        verbose_name
+            Para poner el label, i.e. el nombre que tendrán en forms
+            Si no se pone nada, será el nombre del atributo con espacios en lugar de _ y la primera letra en mayúscula
+        default
+            default value
+        blank
+            if true, the field is allowed to be blank in the forms
+            This is often used with null=True   
+        choices
+            A group of choices for this field. If this is provided, the default corresponding form widget will be a select box with these choices instead of the standard text field.
+        unique
+            If True, ensures that the field value is unique across the database
+            It prevents prevents records being created with exactly the same name, but does not check for lowercase or other possible variations
+        primary_key
+            Es boolean
+        choices
+            Lista de key/value pairs
+            The value in a key/value pair is a display value that a user can select, while the keys are the values that are actually saved if the option is selected
+            Django automatically creates a method get_foo_display() for every choices field foo in a model, which can be used to get the current value of the field
+    Field types: [lista completa](https://docs.djangoproject.com/en/5.0/ref/models/fields/#field-types)
+        CharField
+        TextField
+            Para textos largos
+        IntergerField
+        DateField DateTimeField
+        EmailField
+        FileField
+        ImageField
+        AutoField
+            Es un IntergerField que aumenta automáticamente cuando se añade un elemento
+        ForeignKey
+        ManyToManyField
+        UUIDField
+            Used for the id field to set it as the primary_key for this model. This type of field allocates a globally unique value for each instance (one for every book you can find in the library)
+
+Metadatos:
+
+class Meta: [todas las opciones](https://docs.djangoproject.com/en/5.0/ref/models/options/)
+    ordering = ['title', '-publish_date']
+            the books would be sorted alphabetically by title, from A-Z, and then by publication date inside each title, from newest to oldest
+        control the default ordering of records returned when you query the model type. You do this by specifying the match order in a list of field names to the ordering attribute
+        you can prefix the field name with a minus symbol (-) to reverse the sorting order
+    constraints = [
+            UniqueConstraint(
+                Lower('name'),
+                name='genre_name_case_insensitive_unique',
+                violation_error_message = "Genre already exists (case insensitive match)"
+            ),
+    ]
+    permissions = (("can_mark_returned", "Set book as returned"),)
+
+Métodos
+    Minimally, in every model you should define the standard Python class method __str__() to return a human-readable string for each object. This string is used to represent individual records in the administration site (and anywhere else you need to refer to a model instance). Often this will return a title or name field from the model.
+```python
+def get_absolute_url(self):
+    """Returns the URL to access a particular instance of the model."""
+    return reverse('model-detail-view', args=[str(self.id)])
+```
+        Note: Assuming you will use URLs like /my-application/my-model-name/2 to display individual records for your model (where "2" is the id for a particular record), you will need to create a URL mapper to pass the response and id to a "model detail view" (which will do the work required to display the record). The reverse() function above is able to "reverse" your URL mapper (in the above case named 'model-detail-view') in order to create a URL of the right format.
+
+        Of course to make this work you still have to write the URL mapping, view, and template!
+
+```python
+# Create a new record using the model's constructor.
+record = MyModelName(my_field_name="Instance #1")
+
+# Save the object into the database.
+record.save()
+
+# Change record by modifying the fields, then calling save().
+record.my_field_name = "New Instance Name"
+record.save()
+
+# Get all records of a model
+Book.objects.all()
+
+# We use the format field_name__match_type
+wild_books = Book.objects.filter(title__contains='wild')
+number_wild_books = wild_books.count()
+
+# assuming book is a record of a book
+
+# Te devuelve todos los records de BookInstance que tienen como foreignKey a book
+    # the function is created by lower-casing the model name where the ForeignKey was declared, followed by _set
+book.bookinstance_set.all()
+```
+
+### Usar los modelos
+
+Filtros: 
+    Filter on a field that defines a one-to-many relationship to another model (e.g., a ForeignKey)
+        You can "index" to fields within the related model with additional double underscores.
+        (*)
+        ```python
+            # Will match on: Fiction, Science fiction, non-fiction etc.
+            books_containing_genre = Book.objects.filter(genre__name__icontains='fiction')
+        ```
+    Posibles tipos: [lista completa](https://docs.djangoproject.com/en/5.0/ref/models/querysets/#field-lookups)
+        icontains (case insensitive)
+        iexact (case-insensitive exact match)
+        exact (case-sensitive exact match)
+        in
+        gt (greater than)
+        startswith
+
+## Manejo de sesiones
+
+Según nuestro setup ya hay manejo de sesiones, pero lo q hay q cambiar es, en settings.py (el del proyecto, no la app):
+```python
+INSTALLED_APPS = [
+    # …
+    'django.contrib.sessions',
+    # …
+
+MIDDLEWARE = [
+    # …
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    # …
+```
+
+```python
+# Get a session value by its key (e.g. 'my_car'), raising a KeyError if the key is not present
+my_car = request.session['my_car']
+
+# Get a session value, setting a default if it is not present ('mini')
+my_car = request.session.get('my_car', 'mini')
+
+# Set a session value
+request.session['my_car'] = 'mini'
+
+# Delete a session value
+del request.session['my_car']
+
+# Session object not directly modified, only data within the session. Session changes not saved!
+request.session['my_car']['wheels'] = 'alloy'
+
+# Set session as modified to force data updates/cookie to be saved.
+request.session.modified = True
+```
+
+Si quieres forzar a q updatee la sesión tras cada cambio, en settings.py del proyecto añadir SESSION_SAVE_EVERY_REQUEST = True
+
+## usuarios
+
+Según nuestro setup ya tenemos las cosas preparadas para manejar usuarios, pero lo q hay q cambiar es, en settings.py (el del proyecto, no la app):
+```python
+INSTALLED_APPS = [
+    # …
+    'django.contrib.auth',  # Core authentication framework and its default models.
+    'django.contrib.contenttypes',  # Django content type system (allows permissions to be associated with models).
+    # …
+
+MIDDLEWARE = [
+    # …
+    'django.contrib.sessions.middleware.SessionMiddleware',  # Manages sessions across requests
+    # …
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Associates users with requests using sessions.
+    # …
+```
+
+Para crear un usuario en con código:
+```python
+from django.contrib.auth.models import User
+
+# Create user and save to the database
+user = User.objects.create_user('myusername', 'myemail@crazymail.com', 'mypassword')
+
+# Update fields and then save again
+user.first_name = 'Tyrone'
+user.last_name = 'Citizen'
+user.save()
+```
+
+Si tienes tu propio modelo de usuario es:
+```python 
+# Get current user model from settings
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+# Create user from model and save to the database
+user = User.objects.create_user('myusername', 'myemail@crazymail.com', 'mypassword')
+
+# Update fields and then save again
+user.first_name = 'Tyrone'
+user.last_name = 'Citizen'
+user.save()
+```
+
+**views.py** 
+
+Para que se requiera el login en una función que sea un view 
+    Poner @login_required delante de la función 
+
+Si es un class-based view:
+
+```python
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+class MyView(LoginRequiredMixin, View):
+    # …
+```
+    Puedes añadir login_url para decir el url al que serán redirigidos para q inicien sesión 
+    También hay redirect_field_name que será el nombre que le pondrán al parámetro 'next' en la url del login 
+
+Para acceder al modelo de usuario usado puedes verlo en settings.py, tienes que:
+```python
+from django.conf import settings
+
+# Ahora en user model está el modelo que se usan para los usuarios
+user_model = settings.AUTH_USER_MODEL
+```
+
+django te maneja la redirección de urls automáticamente si añades:
+```python
+# Add Django site authentication urls (for login, logout, password management)
+
+urlpatterns += [
+    path('accounts/', include('django.contrib.auth.urls')),
+]
+```
+
+Te añadirá los mapeos para los siguientes links:
+accounts/ login/ [name='login']   ----> login.html
+accounts/ logout/ [name='logout'] ----> logged_out.html
+accounts/ password_change/ [name='password_change']
+accounts/ password_change/done/ [name='password_change_done']
+accounts/ password_reset/ [name='password_reset'] ----> password_reset_form.html
+    También tendrás que crear password_reset_email.html con el contenido del email para resettear la contraseña que se les mandará
+accounts/ password_reset/done/ [name='password_reset_done'] ----> password_reset_done.html
+accounts/ reset/<uidb64>/<token>/ [name='password_reset_confirm'] ----> password_reset_confirm.html
+accounts/ reset/done/ [name='password_reset_complete'] ----> password_reset_complete.html
+
+Para cada uno de estos, se encarga también de las funciones view y todo. Lo que tienes que crear son los templates
+    Los buscará en la carpeta ¡nombre proyecto!/templates/¡registration! (OJO no en ¡nombre proyecto!/¡nombre proyecto!/templates/¡registration!)
+        Para ver el nombre del fichero, mirar la lista de arriba
+    Hay que incorporar esta carpeta de templates al path, hacerlo del siguiente modo:
+
+```python
+# Importar os si no está ya importado
+# …
+    TEMPLATES = [
+      {
+       # …
+       'DIRS': [os.path.join(BASE_DIR, 'templates')],
+       'APP_DIRS': True,
+       # …
+```
+
+Como nuestra app no manda emails, añadir a settings.py 
+```python
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+```
+    Te imprimirá los emails "mandados" por consola y así puedes obtener el link
+
+**login**
+Después del login, django lleva el usuario a /accounts/profile/. Si quieres q lleve a otro sitio modificar settings.py
+```Python
+# Redirect to home URL after login (Default redirects to /accounts/profile/)
+LOGIN_REDIRECT_URL = '/¡dirección!'
+```
+
+Ejemplo de form de login
+```html
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+  {% if form.errors %}
+    <p>Your username and password didn't match. Please try again.</p>
+  {% endif %}
+
+  {% if next %}
+    {% if user.is_authenticated %}
+      <p>Your account doesn't have access to this page. To proceed,
+      please login with an account that has access.</p>
+    {% else %}
+      <p>Please login to see this page.</p>
+    {% endif %}
+  {% endif %}
+
+  <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    <table>
+      <tr>
+        <td>{{ form.username.label_tag }}</td>
+        <td>{{ form.username }}</td>
+      </tr>
+      <tr>
+        <td>{{ form.password.label_tag }}</td>
+        <td>{{ form.password }}</td>
+      </tr>
+    </table>
+    <input type="submit" value="login">
+    <input type="hidden" name="next" value="{{ next }}">
+  </form>
+
+  {# Assumes you set up the password_reset view in your URLConf #}
+  <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+
+{% endblock %}
+```
+
+Al mandar al usuario a la página de login poner ?next={{ request.path }} al final del link. Así te aseguras de que les redirigen a la página donde estaban después del login
+
+### permisos 
+
+**Definirlos**
+En el meta de un modelo, puedes definir los permisos q van asociados al modelo en la clase Meta del modelo (los permisos relacionados con libros, en el meta del libro) like so:
+(*) permissions = (("can_mark_returned", "Set book as returned"),)
+    Cada tupla es un permiso
+        - El primer valor es nombre del permiso
+        - El segundo valor es el display name del permiso
+
+Automáticamente, django te define change, add and delete permissions para cada modelo 
+
+**Acceder a ellos**
+- Templates:
+    - Están guardados en una variable {{perms}}
+    - Para comprobar si un determinado usuario tiene un permiso, se puede comprobar así:
+        - {{ perms.¡nombre aplicación!.¡nombre permiso a comprobar! }}
+        - (*) {{ perms.catalog.can_mark_returned }}
+        - Puede ser verdadero o falso, y se puede comprobar en un if
+- Views:
+    - Si es una función:
+        Usar el decorador:
+        ```python 
+        from django.contrib.auth.decorators import permission_required
+
+        @permission_required('catalog.can_mark_returned')
+        @permission_required('catalog.can_edit')
+        def my_view(request):
+            # …
+        ```
+        NOTA: con esta configuración, si un usuario que ha iniciado sesión intenta acceder a la página, le devolverán HTTP 302, pero lo deseable sería que le devolvieran HTTP 403. Para q devuelvan 403:
+        ```python 
+        from django.contrib.auth.decorators import login_required, permission_required
+
+        @login_required
+        @permission_required('catalog.can_mark_returned', raise_exception=True)
+        def my_view(request):
+            # …
+        ```
+    - Si es un class_based view:
+    ```python 
+    from django.contrib.auth.mixins import PermissionRequiredMixin
+
+    class MyView(PermissionRequiredMixin, View):
+        permission_required = 'catalog.can_mark_returned'
+        # Or multiple permissions
+        permission_required = ('catalog.can_mark_returned', 'catalog.change_book')
+        # Note that 'catalog.change_book' is permission
+        # Is created automatically for the book model, along with add_book, and delete_book
+    ```
+
+## Forms 
+
+### Creación
+La información de los formularios se debe guardar en un archivo forms.py, dentro de la aplicación pertinente
+
+Ejemplo básico
+```python
+from django import forms
+
+class RenewBookForm(forms.Form):
+    renewal_date = forms.DateField(help_text="Enter a date between now and 4 weeks (default 3).")
+```
+El nombre de cada campo será la textificación del nombre en el formulario
+    (*) en este caso, el nombre que aparecerá será Renewal date:
+
+Tipos de campos principales:
+    - BooleanField
+    - CharField
+    - ChoiceField
+    - TypedChoiceField
+    - DateField
+    - DateTimeField
+    - DecimalField
+    - DurationField
+    - EmailField
+    - FileField
+    - FilePathField
+    - FloatField
+    - ImageField
+    - IntegerField
+    - GenericIPAddressField
+    - MultipleChoiceField
+    - TypedMultipleChoiceField
+    - NullBooleanField
+    - RegexField
+    - SlugField
+    - TimeField
+    - URLField
+    - UUIDField
+    - ComboField
+    - MultiValueField
+    - SplitDateTimeField
+    - ModelMultipleChoiceField
+    - ModelChoiceField
+
+Principales parámetros q puede tener un campo:
+    - required
+        - If true, no se permite q se deje en blanco o null
+        - Por defecto, será true 
+    - label
+        - the label to use when rendering the field in HTML
+    - label_suffix
+        - By default, a colon is displayed after the label (e.g., Renewal date​:). This argument allows you to specify a different suffix containing other character(s)
+    - initial
+        - The initial value for the field when the form is displayed.
+    - help_text
+        - Additional text that can be displayed in forms to explain how to use the field
+    - error_messages
+        - A list of error messages for the field
+    - validators
+        - A list of functions that will be called on the field when it is validated
+    - disabled
+        - The field is displayed but its value cannot be edited if this is True. The default is False
+
+**A partir de un modelo**
+```python
+from django.forms import ModelForm
+
+from catalog.models import BookInstance
+
+class RenewBookModelForm(ModelForm):
+    class Meta:
+        model = BookInstance
+        fields = ['due_back']
+```
+Para especificar los campos, también se puede poner:
+        No se recomienda hacerlo así porque, si añades campos, se agregan automáticamente al formulario sin que el developer lo haya pensado
+    fields = '__all__'
+        Incluye todos los campos
+    exclude = []
+        Incluye todos los campos salvo los de la lista en exclude 
+
+Para ajustar cómo se muestran los campos:
+```python
+class Meta:
+    model = BookInstance
+    fields = ['due_back']
+    labels = {'due_back': _('New renewal date')}
+    help_texts = {'due_back': _('Enter a date between now and 4 weeks (default 3).')}
+```
+
+**Validación**
+The easiest way to validate a single field is to override the method clean_¡field_name!()
+        Esto sirve para forms a partir de modelos y los hechos a pelo
+Uso:
+    - Para obtener la información a validar hay que coger el valor en self.cleaned_data['¡nombre del campo!']
+    - Hay q devolver el campo al final de la función (aún si no lo hemos cambiado)
+    - Si algún dato no verifica las restricciones, hay que raise a ValidationError like so:
+        ```python
+            if data < datetime.date.today():
+                raise ValidationError('Invalid date - renewal in past')
+        ```
+        - En el error se pone el mensaje que queremos que se muestre
+        - Si quieres traducir la página, está bien pasar el texto por un gettext_lazy
+        ```python
+        from django.utils.translation import gettext_lazy as _
+        
+        if data < datetime.date.today():
+            raise ValidationError(_('Invalid date - renewal in past'))
+        ```
+
+### Uso en views.py 
+Para comprobar si es la primera vez q se accede al form, comprobar el method
+
+Pasos generales:
+```python
+
+from catalog.forms import RenewBookForm
+
+def renew_book_librarian(request, pk):
+    book_instance = get_object_or_404(BookInstance, pk=pk)
+
+    # If this is a POST request then process the Form data
+    if request.method == 'POST':
+
+        # Create a form instance and populate it with data from the request (binding):
+        form = RenewBookForm(request.POST)
+
+        # Check if the form is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
+            book_instance.due_back = form.cleaned_data['renewal_date']
+            book_instance.save()
+
+            # redirect to a new URL:
+            return HttpResponseRedirect(reverse('all-borrowed'))
+
+    # If this is a GET (or any other method) create the default form.
+    else:
+        proposed_renewal_date = datetime.date.today() + datetime.timedelta(weeks=3)
+        form = RenewBookForm(initial={'renewal_date': proposed_renewal_date})
+
+    context = {
+        'form': form,
+        'book_instance': book_instance,
+    }
+
+    return render(request, 'catalog/book_renew_librarian.html', context)
+```
+
+También existe una clase [Form view](https://docs.djangoproject.com/en/5.0/ref/class-based-views/generic-editing/#formview)
+
+Además, existen clases que te ayudan a crear formularios de crear, editar o eliminar:
+```python
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from .models import Author
+
+class AuthorCreate(PermissionRequiredMixin, CreateView):
+    model = Author
+    fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death']
+    initial = {'date_of_death': '11/11/2023'}
+    permission_required = 'catalog.add_author'
+    template_name_suffix = "_formulario" # Cambiar el nombre que se esperarán en el template
+
+class AuthorUpdate(PermissionRequiredMixin, UpdateView):
+    model = Author
+    # Not recommended (potential security issue if more fields added)
+    fields = '__all__'
+    permission_required = 'catalog.change_author'
+
+class AuthorDelete(PermissionRequiredMixin, DeleteView):
+    model = Author
+    success_url = reverse_lazy('authors')
+    permission_required = 'catalog.delete_author'
+
+    def form_valid(self, form):
+        try:
+            self.object.delete()
+            return HttpResponseRedirect(self.success_url)
+        # Esto se ha añadido porq borrar un autor no es siempre successful, y así se define qué hacer en caso de que falle
+        except Exception as e:
+            return HttpResponseRedirect(
+                reverse("author-delete", kwargs={"pk": self.object.pk})
+            )
+```
+
+Automáticamente, después de estos formularios, se conduce al usuario a una página con la info específica del record cambiado (usando el reverse, asumo)
+    Si quieres cambiar el lugar donde se lleva, puedes definir el parámetro success_url
+De manera predeterminada, el de crear y update usarán el mismo template, que debería estar en: ¡app!/¡templates!/¡app!/¡nombre del modelo!_form.html
+
+The "delete" view expects to find a template named with the format [model_name]_confirm_delete.html 
+    (again, you can change the suffix using template_name_suffix in your view)
+    Debería incluir un form ahí similar a este:
+    ```html
+        <form action="" method="POST">
+            {% csrf_token %}
+            <input type="submit" action="" value="Yes, delete.">
+        </form>
+    ```
+
+### Uso en templates
+
+```html 
+  <form action="" method="post">
+    {% csrf_token %}
+    <table>
+    {{ form.as_table }}
+    </table>
+    <input type="submit" value="Submit">
+  </form>
+```
+
+Acceder a las opciones de un campo específico:
+- {{ form.renewal_date }}: The whole field.
+- {{ form.renewal_date.errors }}: The list of errors.
+- {{ form.renewal_date.id_for_label }}: The id of the label.
+- {{ form.renewal_date.help_text }}: The field help text
+
+**Otras opciones de renderización**
+as a list {{ form.as_ul }}
+as a paragraph {{ form.as_p }}
+
+
+
+# Bases de datos
+
+Una vez instaladas las dependencias, se debe modificar la variable DATABASES del fichero settings.py de la siguiente manera:
+
+```python
+import dj_database_url
+
+db_from_env = dj_database_url.config(default='postgres://alumnodb:alumnodb@localhost:5432/psi', conn_max_age=500)
+
+DATABASES['default'].update(db_from_env)
+```
+
+Para borrar la base de datos se puede usar el comando 
+```bash
+dropdb -U alumnodb -h localhost psi
+```
+
+Para crear la base de datos
+```bash
+createdb -U alumnodb -h localhost psi
+```
+Crear la base de datos, es necesario volver a poblarla ejecutando el script populate_catalog.py.
+
+NOTA: las bases de datos creadas usando PostgreSQL no se borran al apagar el ordenador del laboratorio. Es recomendable borrarlas de una vez a otra
+
+# Admin page 
+
+Registrar modelos en la página de admin. Por ejemplo, para dejarte añadir y modificar instancias de los modelos
+```python
+from .models import ¡modelo!
+
+admin.site.register(¡modelo, como clase, con la primera letra en mayúscula!)
+```
+
+Crear superusuario
+```bash
+python3 manage.py createsuperuser
+```
+
+## Customize 
+To change how a model is displayed in the admin interface you define a ¡Model name. El nombre del modelo va en mayúsucla!Admin class (which describes the layout) and register it with the model
+(*) AuthorAdmin
+```python
+# Register the Admin classes for Book using the decorator
+@admin.register(Book)
+class BookAdmin(admin.ModelAdmin):
+    pass
+
+# Define the admin class
+class AuthorAdmin(admin.ModelAdmin):
+    pass
+
+# Register the admin class with the associated model
+admin.site.register(Author, AuthorAdmin)
+```
+Ambas maneras sirven para registrar el adminclass. Para usar esto, hay que comentar la línea donde se importa de manera normal
+
+Things you can add or change with these classes:
+list_display
+    (*) list_display = ('last_name', 'first_name', 'date_of_birth', 'date_of_death')
+    Te permite estaer qué campos se enseñan cuando se muestran las instancias en formato lista
+    Es un parámetro de clase y se especifican los campos igualándolo a una tupla.
+    Los parámetros deben aparecer en la tupla en el orden en el que quieres que aparezcan en la lista
+        Si alguno de los atributos especificados es un foreign key, te pondrá su __str__
+        No se permite asociar un atributo a un ManyToManyField, pero sí que puedes asociarlo a una función que devuelva un string
+            A esta función se le puede añadir un atributo "short_description" que será el nombre de la columna a la que lo asociará
+            (*)
+            ```python
+                def display_genre(self):
+                    """Create a string for the Genre. This is required to display genre in Admin."""
+                    return ', '.join(genre.name for genre in self.genre.all()[:3])
+
+                display_genre.short_description = 'Genre'
+            ```
+list_filter
+    (*) list_filter = ('status', 'due_back')
+    Para hacer filtros
+fields
+    (*) fields = ['first_name', 'last_name', ('date_of_birth', 'date_of_death')]
+    fields attribute lists just those fields that are to be displayed on the form, in order.
+    Fields are displayed vertically by default, but will display horizontally if you further group them in a tuple (as shown in the "date" fields above).
+fieldsets
+    (*) fieldsets = (
+            (None, {
+                'fields': ('book', 'imprint', 'id')
+            }),
+            ('Availability', {
+                'fields': ('status', 'due_back')
+            }),
+        )
+    You can add "sections" to group related model information within the detail form, using the fieldsets attribute.
+    Each section has its own title (or None, if you don't want a title) and an associated tuple of fields in a dictionary
+inlines [Más información](https://docs.djangoproject.com/en/5.0/ref/contrib/admin/#django.contrib.admin.ModelAdmin.inlines)
+    (*) inlines = [BookInstanceInline]
+    Te permite editar instancias asociadas a la vez (por ejemplo, que pueda añadir una instancia de libro cada vez que añado un libro)
+    Instancias la variable con una lista de clases Inline, que tienes que declarar antes
+    Clases inline
+        Declarar: 
+            (*)
+            class BooksInstanceInline(admin.TabularInline):
+                model = BookInstance
+        Variables que se pueden añadir:
+            extra
+                Cuando se pone a 0 te enseña sólo instancias con datos, no te da la opción de generar una a no ser que le des al botón
+
+
+# Errores y soluciones
+django.core.exceptions.ImproperlyConfigured: Requested setting INSTALLED_APPS, but settings are not configured. You must either define the environment variable DJANGO_SETTINGS_MODULE or call settings.configure() before accessing settings.
+    Eso es que no has explicado que settings file usar, correr:
+    export DJANGO_SETTINGS_MODULE=¡link a los ajustes!
+        El link es (*) locallibrary.settings
+    
+    Acceder al shell
+        python3 manage.py shell
+
+Si los tests dicen:
+    ValueError: Missing staticfiles manifest entry
+    Correr:
+        python3 manage.py collectstatic
+# html
+
+Ejemplo de form
+```html
+<form action="/team_name_url/" method="post">
+  <label for="team_name">Enter name: </label>
+  <input
+    id="team_name"
+    type="text"
+    name="name_field"
+    value="Default name for team." />
+  <input type="submit" value="OK" />
+</form>
+```
+Submit sube toda la información de todos los campos. Por defecto, será un botón
+Action es el link al q subirán la información
+Method es cómo se subirán los datos
+    Poner siempre POST, a no ser q la información no edite nada del servidor y quieres q sea un resultado compartible (*) una búsqueda

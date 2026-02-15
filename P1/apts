@@ -1,0 +1,62 @@
+Repositorio dado por ellos: https://github.com/rmarabini/psi-alumnos/tree/2025-26/
+¡!
+Venv management:
+	conda create -n ¡nombre venv! python==¡versión de python que toque!
+	conda activate ¡nombre!
+	Ya estamos dentro del venv
+	pip3 install -r requirements.txt
+		Te instala todas las dependencias del archivo requirements.txt
+pip list
+	te dice los paquetes que están instalados
+tree ¡nombre!
+	Es como ls pero te pone en bonito los archivos y va hacia dentro
+
+
+Django
+	settings.py
+		Cuando creas una aplicación tienes que añadirla en INSTALLED_APPS (variable del fichero settings.py).
+			Le pones el nombre tal cual, sin nada delante
+		Puedes añadir una variable STATIC_URL que define la dirección en el url donde se encuentran
+			Luego puedes modificar el archivo html correspondiente poniendo { % load static % }
+	urls.py (de la aplicación)
+		El primer argumento de path es lo que habría escrito en: http://localhost:8000/¡aquí!
+			Para que te acepte variables:
+			path("<¡tipo de variable!:¡nombre de la variable!>/", ¡función a la que llamar!, name=¡no importa!)
+			Y en urls.py (del proyecto)
+			path('', include(¡nombre aplicación!.urls))
+
+Desplegar la aplicación:
+	Render
+		Para que funcione con esto, en settings.py del proyecto (la grande) hay que modificar:
+			- ALLOWED_HOSTS
+				- Habría que poner en qué ordenador se va a correr la aplicación final, se puede obtener con os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+				Y eso hay q ponerlo en la lista de ALLOWED_HOSTS
+			- DEBUG = False
+			- SECRET_KEY
+				- No debería ser pública, sino que habría que definirlo con una variable de entorno en render, ya veremos cómo
+			- Configurar los archivos estáticos, ver STATIC_URL abajo
+			- MIDDLEWARE
+				- Añadir justo después de security, whitenoise.middleware.WhiteNoiseMiddleware
+					Sirve para servir los ficheros estáticos, aunque no sé muy bien qué hace
+		Crear archivo build.sh
+			python3 manage.py collectstatic --noinput
+				- Carga los archivos estáticos
+				- Again, no entiendo
+		En el proyect root hay que poner la ruta a la carpeta donde esté el fichero manage.py, sin el archivo
+			
+	Neon.tech
+		Este es el que lo usaremos para las bases de datos
+		Para añadir usuarios es un users&conections
+	
+		
+Templates
+	Las variables van entre corchetes dobes
+Correr el proyecto:
+	Los ordenadores de los laboratorio tienen algo puesto en el puerto 8000
+	python manage.py runserver <número de puerto>
+		Te pone a correr el servidor en el número de puerto dado
+
+STATIC_URL
+	la dirección de los ficheros estáticos. Es decir, cuando accedes a localhost/¡esta dirección!, te devuelven todos los ficheros que están en la carpeta definida en STATTIC_ROOT
+STATIC_ROOT
+	Dirección en el disco duro donde están los archivos estáticos que servirá
