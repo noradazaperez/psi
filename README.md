@@ -1,5 +1,7 @@
 # psi
 
+Tests, leyendo la explicación del código de test Author
+
 [Enlace tutorial django](http://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Server-side/Django)
 [Enlace repositorio profes](https://github.com/rmarabini/psi-alumnos/tree/2025-26/)
 

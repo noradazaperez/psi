@@ -1023,6 +1023,10 @@ django.core.exceptions.ImproperlyConfigured: Requested setting INSTALLED_APPS, b
     Acceder al shell
         python3 manage.py shell
 
+Si los tests dicen:
+    ValueError: Missing staticfiles manifest entry
+    Correr:
+        python3 manage.py collectstatic
 # html
 
 Ejemplo de form
