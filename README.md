@@ -77,6 +77,7 @@ Render.com
     DEBUG
     SECRET_KEY
         QUITARLA DE GH!!!!
+    ALLOWED_HOSTS
 
 ## Pregs
 
