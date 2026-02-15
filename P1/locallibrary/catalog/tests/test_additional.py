@@ -25,15 +25,22 @@ class AuthorDeleteViewTest(TestCase):
         test_user1 = User.objects.create_user(username='testuser1', password='1X<ISRUkw+tuK')
         test_user1.save()
 
+        test_author = Author.objects.create(
+                first_name=f'Dominique',
+                last_name=f'Surname',
+            )
+        
+        test_author.save()
+
     def test_redirect_if_not_logged_in(self):
-        response = self.client.get(reverse('author-delete'))
+        response = self.client.get(reverse('author-delete', kwargs={'pk': self.test_author.pk}))
         # Manually check redirect (Can't use assertRedirect, because the redirect URL is unpredictable)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.url.startswith('/accounts/login/'))
 
     def test_logged_in_with_permission(self):
         login = self.client.login(username='test_user', password='some_password')
-        response = self.client.get(reverse('author-delete'))
+        response = self.client.get(reverse('author-delete', kwargs={'pk': self.test_author.pk}))
 
         # Check that it lets us see the view
         self.assertEqual(response.status_code, 200)
@@ -41,7 +48,7 @@ class AuthorDeleteViewTest(TestCase):
     def test_uses_correct_template(self):
         self.client.login(username='test_user', password='some_password')
 
-        response = self.client.get(reverse('author-delete'))
+        response = self.client.get(reverse('author-delete', kwargs={'pk': self.test_author.pk}))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'catalog/author_confirm_delete.html')
 '''
