@@ -15,11 +15,11 @@ class AuthorDeleteViewTest(TestCase):
         test_user = User.objects.create_user(
             username='test_user', password='some_password')
 
-        permAddAuthor = Permission.objects.get(
-            codename="add_author"
+        permAuthor = Permission.objects.get(
+            codename="delete_author"
         )
 
-        test_user.user_permissions.add(permAddAuthor)
+        test_user.user_permissions.add(permAuthor)
         test_user.save()
 
         test_user1 = User.objects.create_user(username='testuser1', password='1X<ISRUkw+tuK')

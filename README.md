@@ -1,6 +1,6 @@
 # psi
 
-Tests, leyendo la explicación del código de test Author
+Aumentar coverage, not changed even with additional tests
 
 [Enlace tutorial django](http://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Server-side/Django)
 [Enlace repositorio profes](https://github.com/rmarabini/psi-alumnos/tree/2025-26/)
@@ -64,7 +64,8 @@ Render.com
 1. Acceso github
 2. Whitenoise / gunicorn
     - Esto es para servir los ficheros estáticos 
-        - Meterlo en requirements.txt
+        - Ponerlo como middleware
+        - buscar cosas con static
 3. build.sh 
     pip install -r requirements.txt 
         Lo más importante
