@@ -25,12 +25,9 @@ class AuthorDeleteViewTest(TestCase):
         test_user1 = User.objects.create_user(username='testuser1', password='1X<ISRUkw+tuK')
         test_user1.save()
 
-        test_author = Author.objects.create(
-                first_name=f'Dominique',
-                last_name=f'Surname',
-            )
+        self.test_author = Author.objects.create(first_name='Dominique', last_name='Rousseau')
         
-        test_author.save()
+        self.test_author.save()
 
     def test_redirect_if_not_logged_in(self):
         response = self.client.get(reverse('author-delete', kwargs={'pk': self.test_author.pk}))
