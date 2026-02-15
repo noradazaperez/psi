@@ -64,6 +64,8 @@ class Book(models.Model):
 
     display_genre.short_description = 'Genre'
 
+    class Meta:
+        ordering = ['title']
 
 
 class BookInstance(models.Model):
@@ -138,5 +140,6 @@ class Author(models.Model):
         return f'{self.last_name}, {self.first_name}'
     
     def display_genre(self):
-        """Create a string for the Genre. This is required to display genre in Admin."""
-        return ', '.join(genre.name for genre in self.genre.all()[:3])
+        """Return a short, comma-separated list of genres for the author's books."""
+        qs = Genre.objects.filter(book__author=self).distinct().values_list('name', flat=True)
+        return ', '.join(qs[:3])

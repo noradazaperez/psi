@@ -6,13 +6,13 @@ admin.site.register(Language)
 admin.site.register(Genre)
 #admin.site.register(Author)
 
-class BookInline(admin.TabularInline):
+class BooksInline(admin.TabularInline):
     model = Book
-
 
 class AuthorAdmin(admin.ModelAdmin):
     list_display = ('last_name', 'first_name', 'date_of_birth', 'date_of_death')
-    inlines = [BookInline]
+    inlines = [BooksInline]
+    fields = ['first_name', 'last_name', ('date_of_birth', 'date_of_death')]
     
 admin.site.register(Author, AuthorAdmin)
 
@@ -28,4 +28,5 @@ class BookAdmin(admin.ModelAdmin):
 # Register the Admin classes for BookInstance using the decorator
 @admin.register(BookInstance)
 class BookInstanceAdmin(admin.ModelAdmin):
-    list_filter = ('book', 'status', 'due_back', 'id')
+    list_display = ('book', 'status', 'due_back', 'id')
+    list_filter = ('status', 'due_back')

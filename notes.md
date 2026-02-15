@@ -101,9 +101,9 @@ python3 manage.py runserver
     ```
 
     * para acceder a la página de administración:
-    ```bash
-        http://localhost:8000/admin
-    ```
+```bash
+    http://localhost:8000/admin
+```
 
     * Advanced Configuration
     - List Views:
@@ -112,33 +112,35 @@ python3 manage.py runserver
         - add additional options to the actions menu in list views and choose where this menu is displayed on the from
 
         * We define a **ModelAdmin** class
-        ```python
-            # Define the admin class
-            class AuthorAdmin(admin.ModelAdmin):
-                pass
 
-            # Register the admin class with the associated model
-            admin.site.register(Author, AuthorAdmin)
-        ```
+```python
+    # Define the admin class
+    class AuthorAdmin(admin.ModelAdmin):
+        pass
+
+    # Register the admin class with the associated model
+    admin.site.register(Author, AuthorAdmin)
+```
+
         Another syntax
-        ```python
-            # Register the Admin classes for Book using the decorator
-            @admin.register(Book)
-            class BookAdmin(admin.ModelAdmin):
-                pass
+```python
+    # Register the Admin classes for Book using the decorator
+    @admin.register(Book)
+    class BookAdmin(admin.ModelAdmin):
+        pass
 
-            # Register the Admin classes for BookInstance using the decorator
-            @admin.register(BookInstance)
-            class BookInstanceAdmin(admin.ModelAdmin):
-                pass
-        ```
+    # Register the Admin classes for BookInstance using the decorator
+    @admin.register(BookInstance)
+    class BookInstanceAdmin(admin.ModelAdmin):
+        pass
+```
 
         * Filtering
-        ```python
-            class BookInstanceAdmin(admin.ModelAdmin):
-                list_filter = ('status', 'due_back')    
+```python
+    class BookInstanceAdmin(admin.ModelAdmin):
+        list_filter = ('status', 'due_back')    
 
-        ```
+```
 
     - Detail Views:
         - choose which fields to display (or exclude), along with their order, grouping, whether they are editable, the widget used, orientation etc.
@@ -148,30 +150,31 @@ python3 manage.py runserver
         *Fields* attribute = those fields that are to be displayed on the form, in order.
         In a tuple = horizontally
         *Exclude* attribute = 
-        ```python
-            class AuthorAdmin(admin.ModelAdmin):
-                list_display = ('last_name', 'first_name', 'date_of_birth', 'date_of_death')
 
-                fields = ['first_name', 'last_name', ('date_of_birth', 'date_of_death')]
+```python
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = ('last_name', 'first_name', 'date_of_birth', 'date_of_death')
 
-        ```
+    fields = ['first_name', 'last_name', ('date_of_birth', 'date_of_death')]
+
+```
 
         *Section* : *fieldsets* attribute.
-        ```python
-            @admin.register(BookInstance)
-            class BookInstanceAdmin(admin.ModelAdmin):
-                list_filter = ('status', 'due_back')
 
-                fieldsets = (
-                    (None, {
-                        'fields': ('book', 'imprint', 'id')
-                    }),
-                    ('Availability', {
-                        'fields': ('status', 'due_back')
-                    }),
-                )
+```python
+    @admin.register(BookInstance)
+    class BookInstanceAdmin(admin.ModelAdmin):
+    list_filter = ('status', 'due_back')
 
-        ```
+    fieldsets = (
+        (None, {
+            'fields': ('book', 'imprint', 'id')
+        }),
+        ('Availability', {
+            'fields': ('status', 'due_back')
+        }),
+    )
+```
 
         * Inline editing of associated records
         Sometimes it can make sense to be able to add associated records at the same time.
@@ -204,7 +207,7 @@ python3 manage.py runserver
   ```
 
   To link to our home page from any other page:
-  ```python
+  ```html
   <a href="{% url 'index' %}">Home<\a>
   ```
 
@@ -220,6 +223,11 @@ python3 manage.py runserver
   
   - To **fetch the number of records**: Book.objects.all()
   - To **filter**: BookInstance.objects.filter(status__exact='a')
+    field__lookup=value pattern like:
+    * status__exact
+    * status__iexact - case insensitive
+    * status__in=['a','b']
+    * status__contains='a'
   
 ### *Template*: text file that defines the structure or layout of a file
 *  in the index view that we just added, the render() function will expect to find the file index.html in /django-locallibrary-tutorial/catalog/templates/ and will raise an error if the file is not present.
@@ -251,16 +259,109 @@ python3 manage.py runserver
 ```
 
 Add an image into the page in a similar way:
-```html
-{% load static %}
-<img
-  src="{% static 'images/local_library_model_uml.png' %}"
-  alt="UML diagram"
-  style="width:555px;height:540px;" />
-```
+    ```html
+    {% load static %}
+    <img
+    src="{% static 'images/local_library_model_uml.png' %}"
+    alt="UML diagram"
+    style="width:555px;height:540px;" />
+    ```
 
 ### Linking to URLs
 The base template above introduced the url template tag. It accepts the name of a path() function called in your urls.py. 
 ```html
 <li><a href="{% url 'index' %}">Home</a></li>
 ```
+
+## Generic list and detail views
+
+### Generic List
+- Views can be implementd as a class. We accss the appropriate view function by calling thee class method as_view()
+- The generic view will query the database to get all records for the specified model then render a template located at /django-locallibrary-tutorial/catalog/templates/catalog/book_list.html
+
+- **Note**: The generic views look for templates in */application_name/the_model_name_list.html*
+
+```python
+class BookListView(generic.ListView):
+    model = Book
+```
+```python
+class BookListView(generic.ListView):
+    model = Book
+    context_object_name = 'book_list' # your own name for the list as a template variable
+    queryset = Book.objects.filter(title__icontains='war')[:5]
+    template_name = 'books/my_arbitrary_template_name_list.html' # specify your own template name/location
+
+```
+
+### Overriding methods in class-based views
+- `get_queryset()`- change the list of records returned
+- `get_context_data()` - pass additional context variables to the template. Follow this pattern:
+1. First get the existing context from superclass
+2. Then add your new context information
+3. Then return the new (updated) context
+
+```python
+class BookListView(generic.ListView):
+    model = Book
+
+    def get_context_data(self, **kwargs):
+        context = super(BookListView, self).get_context_data(**kwargs)
+        context['some_data'] = 'this is just some data'
+        return context
+
+```
+
+- The view passes the context (list of books) by default as `object_list` and `book_list` aliases
+### Conditional Execution
+
+```html
+{% if book_list %}
+{% else %}
+    <p>There are no books<\p>
+{% endif %}
+```
+
+### For Loops
+Empty tag to definee what happens if the book list is empty
+
+```html
+{% for book in book_list %}
+    <li> <\li>
+{% empty %}
+{% endfor %}
+```
+
+### Accessing variables
+The code inside the loops creates a list item.
+- Access the *fields* of the associated book record
+- Call *functions* in the model from within our template. This works provided thee function does not havee arguments 
+
+
+### Detail View
+```python
+class BookDetailView(generic.DetailView):
+    model = Book
+```
+
+- All you need to do is create a template called `/catalog/book_detail.html`
+- The view will pass it the database information for the spcific Book record
+- `book.bookinstance_set.all()` : return the set of BookInstance records associated with a particular Book.
+    * Declare a ForeignKey field only in the "many" side of the relationship
+    * Django constructs a "reverse lookup" : 
+        lower-cast the model name where the foreign key is declared + _set
+
+        - all() : get all the records 
+        - filter() : geet a subset of records in code 
+- `copy.get_status_display` : since BookInstance.status is a choices field, Django automatically creates a method `get_foo_display` for every choices field foo in a model. 
+
+### Pagination
+- Pagination built into the generic class-based list views 
+
+```python
+class BookListView(generic.ListView):
+    model = Book
+    paginate_by = 10
+
+```
+

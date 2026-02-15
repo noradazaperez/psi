@@ -1,5 +1,10 @@
 {% extends "base_generic.html" %}
 
+{% block title %}
+  <title>Super fun Local Library!!</title>
+{% endblock %}
+
+
 {% block content %}
   <h1>Local Library Home</h1>
   <p>
@@ -14,4 +19,6 @@
     <li><strong>Copies available:</strong> {{ num_instances_available }}</li>
     <li><strong>Authors:</strong> {{ num_authors }}</li>
   </ul>
+  <h3>Genres:</h3> {{ num_genre }}
+  <h3>Books containing the letter 'a' in the title:</h3> {{ num_books_word }}
 {% endblock %}
