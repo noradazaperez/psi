@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_extensions",
     # Añadir aquí la dependencia de la aplicación
     'catalog.apps.CatalogConfig',
 ]
