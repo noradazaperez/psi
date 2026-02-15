@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from catalog.models import Author
 
+
 class AuthorModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -33,7 +34,7 @@ class AuthorModelTest(TestCase):
         max_length = author._meta.get_field('first_name').max_length
         self.assertEqual(max_length, 100)
 
-    def test_first_name_max_length(self):
+    def test_last_name_max_length(self):
         author = Author.objects.get(first_name='Big')
         max_length = author._meta.get_field('last_name').max_length
         self.assertEqual(max_length, 100)
@@ -45,5 +46,5 @@ class AuthorModelTest(TestCase):
 
     def test_get_absolute_url(self):
         for author in Author.objects.all():
-            self.assertEqual(author.get_absolute_url(), '/catalog/author/' + str(author.pk))
-        
+            self.assertEqual(author.get_absolute_url(),
+                             '/catalog/author/' + str(author.pk))

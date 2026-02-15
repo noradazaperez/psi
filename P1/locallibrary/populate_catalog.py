@@ -14,7 +14,6 @@ from catalog.models import Book, BookInstance, Language, Genre, Author
 
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Permission
-from django.core.exceptions import ObjectDoesNotExist
 import warnings
 
 # Dummy Privileged user for restricted operations: Library Supervisor

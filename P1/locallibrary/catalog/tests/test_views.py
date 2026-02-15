@@ -1,7 +1,18 @@
 from django.test import TestCase
-from django.urls import reverse
+from django.urls import reverse, timezone
 
-from catalog.models import Author
+# Get user model from settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission # Required to grant the
+# permission needed to set a book as returned.
+
+from catalog.models import Author, BookInstance, Book, Genre, Language
+
+import datetime
+import uuid
+
+User = get_user_model()
+
 
 class AuthorListViewTest(TestCase):
     @classmethod
@@ -31,7 +42,7 @@ class AuthorListViewTest(TestCase):
     def test_pagination_is_ten(self):
         response = self.client.get(reverse('authors'))
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('is_paginated' in response.context)
+        self.assertTrue('is_paginated' in response.context == True)
         self.assertTrue(response.context['is_paginated'] == True)
         self.assertEqual(len(response.context['author_list']), 10)
 
@@ -43,15 +54,6 @@ class AuthorListViewTest(TestCase):
         self.assertTrue(response.context['is_paginated'] == True)
         self.assertEqual(len(response.context['author_list']), 3)
 
-import datetime
-
-from django.utils import timezone
-
-# Get user model from settings
-from django.contrib.auth import get_user_model
-User = get_user_model()
-
-from catalog.models import BookInstance, Book, Genre, Language
 
 class LoanedBookInstancesByUserListViewTest(TestCase):
     def setUp(self):
@@ -64,7 +66,6 @@ class LoanedBookInstancesByUserListViewTest(TestCase):
 
         # Create a book
         test_author = Author.objects.create(first_name='Dominique', last_name='Rousseau')
-        test_genre = Genre.objects.create(name='Fantasy')
         test_language = Language.objects.create(name='English')
         test_book = Book.objects.create(
             title='Book Title',
@@ -76,13 +77,13 @@ class LoanedBookInstancesByUserListViewTest(TestCase):
 
         # Create genre as a post-step
         genre_objects_for_book = Genre.objects.all()
-        test_book.genre.set(genre_objects_for_book) # Direct assignment of many-to-many types not allowed.
+        test_book.genre.set(genre_objects_for_book)  # Direct assignment of many-to-many types not allowed.
         test_book.save()
 
         # Create 30 BookInstance objects
         number_of_book_copies = 30
         for book_copy in range(number_of_book_copies):
-            return_date = timezone.localtime() + datetime.timedelta(days=book_copy%5)
+            return_date = timezone.localtime() + datetime.timedelta(days=book_copy % 5)
             the_borrower = test_user1 if book_copy % 2 else test_user2
             status = 'm'
             BookInstance.objects.create(
@@ -108,7 +109,7 @@ class LoanedBookInstancesByUserListViewTest(TestCase):
 
         # Check we used correct template
         self.assertTemplateUsed(response, 'catalog/bookinstance_list_borrowed_user.html')
-    
+
     def test_only_borrowed_books_in_list(self):
         login = self.client.login(username='testuser1', password='1X<ISRUkw+tuK')
         response = self.client.get(reverse('my-borrowed'))
@@ -146,7 +147,7 @@ class LoanedBookInstancesByUserListViewTest(TestCase):
     def test_pages_ordered_by_due_date(self):
         # Change all books to be on loan
         for book in BookInstance.objects.all():
-            book.status='o'
+            book.status = 'o'
             book.save()
 
         login = self.client.login(username='testuser1', password='1X<ISRUkw+tuK')
@@ -168,9 +169,6 @@ class LoanedBookInstancesByUserListViewTest(TestCase):
                 self.assertTrue(last_date <= book.due_back)
                 last_date = book.due_back
 
-import uuid
-
-from django.contrib.auth.models import Permission # Required to grant the permission needed to set a book as returned.
 
 class RenewBookInstancesViewTest(TestCase):
     def setUp(self):
@@ -188,7 +186,6 @@ class RenewBookInstancesViewTest(TestCase):
 
         # Create a book
         test_author = Author.objects.create(first_name='Dominique', last_name='Rousseau')
-        test_genre = Genre.objects.create(name='Fantasy')
         test_language = Language.objects.create(name='English')
         test_book = Book.objects.create(
             title='Book Title',
@@ -200,7 +197,8 @@ class RenewBookInstancesViewTest(TestCase):
 
         # Create genre as a post-step
         genre_objects_for_book = Genre.objects.all()
-        test_book.genre.set(genre_objects_for_book) # Direct assignment of many-to-many types not allowed.
+        test_book.genre.set(genre_objects_for_book)  # Direct assignment
+        # of many-to-many types not allowed.
         test_book.save()
 
         # Create a BookInstance object for test_user1
@@ -276,7 +274,7 @@ class RenewBookInstancesViewTest(TestCase):
         valid_date_in_future = datetime.date.today() + datetime.timedelta(weeks=2)
         response = self.client.post(reverse('renew-book-librarian', kwargs={'pk':self.test_bookinstance1.pk,}), {'renewal_date':valid_date_in_future})
         self.assertRedirects(response, reverse('all-borrowed'))
-    
+
     def test_form_invalid_renewal_date_past(self):
         login = self.client.login(username='testuser2', password='2HJ1vRV0Z&3iD')
         date_in_past = datetime.date.today() - datetime.timedelta(weeks=1)
@@ -290,6 +288,7 @@ class RenewBookInstancesViewTest(TestCase):
         response = self.client.post(reverse('renew-book-librarian', kwargs={'pk': self.test_bookinstance1.pk}), {'renewal_date': invalid_date_in_future})
         self.assertEqual(response.status_code, 200)
         self.assertFormError(response.context['form'], 'renewal_date', 'Invalid date - renewal more than 4 weeks ahead')
+
 
 class AuthorCreateViewTest(TestCase):
     """Test case for the AuthorCreate view (Created as Challenge)."""
@@ -306,27 +305,29 @@ class AuthorCreateViewTest(TestCase):
         test_user.user_permissions.add(permAddAuthor)
         test_user.save()
 
-        test_user1 = User.objects.create_user(username='testuser1', password='1X<ISRUkw+tuK')
+        test_user1 = User.objects.create_user(username='testuser1',
+                                              password='1X<ISRUkw+tuK')
         test_user1.save()
 
     def test_redirect_if_not_logged_in(self):
         response = self.client.get(reverse('author-create'))
-        # Manually check redirect (Can't use assertRedirect, because the redirect URL is unpredictable)
+        # Manually check redirect (Can't use assertRedirect,
+        # because the redirect URL is unpredictable)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.url.startswith('/accounts/login/'))
 
     def test_forbidden_if_logged_in_but_not_correct_permission(self):
-        login = self.client.login(username='testuser1', password='1X<ISRUkw+tuK')
+        self.client.login(username='testuser1', password='1X<ISRUkw+tuK')
         response = self.client.get(reverse('author-create'))
         self.assertEqual(response.status_code, 403)
 
     def test_logged_in_with_permission(self):
-        login = self.client.login(username='test_user', password='some_password')
+        self.client.login(username='test_user', password='some_password')
         response = self.client.get(reverse('author-create'))
 
         # Check that it lets us see the view
         self.assertEqual(response.status_code, 200)
-    
+
     def test_uses_correct_template(self):
         self.client.login(username='test_user', password='some_password')
 
@@ -335,18 +336,20 @@ class AuthorCreateViewTest(TestCase):
         self.assertTemplateUsed(response, 'catalog/author_form.html')
 
     def test_form_date_of_death_initially_set_to_expected_date(self):
-        login = self.client.login(username='test_user', password='some_password')
+        self.client.login(username='test_user', password='some_password')
         response = self.client.get(reverse('author-create'))
         self.assertEqual(response.status_code, 200)
 
         inital_date = datetime.datetime(2023, 11, 11)
-        self.assertEqual(response.context['form'].initial['date_of_death'], inital_date)
-        
-    def test_redirects_to_detail_view_on_success(self):
-        login = self.client.login(username='test_user', password='some_password')
-        valid_date_in_future = datetime.date.today() + datetime.timedelta(weeks=2)
-        response = self.client.post(reverse('author-create'), {'first_name':'Big', 'last_name':'Bob'})
+        self.assertEqual(response.context['form'].initial['date_of_death'],
+                         inital_date)
 
-        # Manually check redirect (Can't use assertRedirect, because the redirect URL is unpredictable)
+    def test_redirects_to_detail_view_on_success(self):
+        self.client.login(username='test_user', password='some_password')
+        response = self.client.post(reverse('author-create'),
+                                    {'first_name': 'Big', 'last_name': 'Bob'})
+
+        # Manually check redirect (Can't use assertRedirect,
+        # because the redirect URL is unpredictable)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.url.startswith('/catalog/author/'))
