@@ -11,8 +11,8 @@ catalog/migrations/0004_remove_language_language_name_case_insensitive_unique_an
 catalog/migrations/0005_alter_author_options_alter_book_options_and_more.py                     6      0   100%
 catalog/migrations/0006_alter_bookinstance_options.py                                           4      0   100%
 catalog/migrations/__init__.py                                                                  0      0   100%
-catalog/models.py                                                                              66      4    94%   25, 59, 67, 109
+catalog/models.py                                                                              66      1    98%   25
 catalog/urls.py                                                                                 7      0   100%
-catalog/views.py                                                                               99     10    90%   149-153, 174-178
+catalog/views.py                                                                               99      3    97%   151, 177-178
 -------------------------------------------------------------------------------------------------------------------------
-TOTAL                                                                                         247     14    94%
+TOTAL                                                                                         247      4    98%
