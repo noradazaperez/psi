@@ -282,6 +282,8 @@ Para heredar de otro archivo
 
 Para sobreescribir un bloque, es igual que declararlo, añadiendo los tags de block y endblock con el nombre
 
+    Para acceder al bloque padre puedes añadir {{ block.super }}
+
 **paginación**
 OJO: cuando paginas, la clase paginada tiene que tener un órden definido o django se vuelve loco (error)
     Soluciones:
