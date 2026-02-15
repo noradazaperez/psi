@@ -1,0 +1,21 @@
+ul.index {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+body {
+  counter-reset: numbering;
+}
+
+ul.index li::before {
+    counter-increment: numbering;
+    font-weight: 900;
+    padding: 4px 8px;
+    border-radius: 20%;
+    content: counter(numbering);
+    color: blue;
+    margin-right: 5px;
+    background-color: orange;
+}
