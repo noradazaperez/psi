@@ -365,3 +365,40 @@ class BookListView(generic.ListView):
 
 ```
 
+## Sessions Framework
+- Session: attribute you can read and write as many times as you like in your view
+- Updating some information within session data > explicitly mark the session as having been modified
+```python
+request.session['my_car']['wheels'] = 'alloy'
+request.session.modified = True
+```
+```python
+my_car = request.session['my_car']
+my_car = request.session.get('my_car', 'mini')
+request.session['my_car'] = 'mini'
+del request.session['my_car']
+```
+
+## Authentication and Permissions
+- Enable authentication: 
+- Creating users and groups: 
+    * Create users programmatically: 
+    ```python
+    from django.contrib.auth.models import User
+
+    user = User.objects.create_user('myusername', 'myemail@crazymail.com', 'mypassword')
+    user.first_name = 'Tyrone'
+    user.last_name = 'Citizen'
+    user.save()
+    ```
+- Authentication View: login, log out, and password management.
+- Password reset templates.
+
+- Qué podemos hacere para controlar selctivamente el contenido que el usuario ve basado en si ha iniciado sesión o no
+```html
+{% if user.is_authenticated %}
+```
+
+- Nótese también cómo hemos añadido ?next={{request.path}} al final de las URLs. 
+    * añadir el párametro URL next que contiene la dirección (URL) de la página actual, al final de la URL enlazada
+    * Después de que el usuario haya iniciado o cerrado sesión con éxito, las vistas usarán el valor de este "next" para redirigir al usuario de vuelta a la página donde pincharon primeramente el enlace de inicio/cierre de sesión.

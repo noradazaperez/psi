@@ -19,6 +19,10 @@
     <li><strong>Copies available:</strong> {{ num_instances_available }}</li>
     <li><strong>Authors:</strong> {{ num_authors }}</li>
   </ul>
-  <h3>Genres:</h3> {{ num_genre }}
-  <h3>Books containing the letter 'a' in the title:</h3> {{ num_books_word }}
+  <h4>Genres:</h4> {{ num_genre }}
+  <h4>Books containing the letter 'a' in the title:</h4> {{ num_books_word }}
+
+  <p>
+    You have visited this page {{ num_visits }} time{{ num_visits|pluralize }}.
+  </p>
 {% endblock %}
