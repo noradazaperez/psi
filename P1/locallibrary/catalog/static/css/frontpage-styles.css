@@ -1,0 +1,41 @@
+/* Estilos específicos para la página principal - índice de la biblioteca */
+
+/* Contenedor de la lista principal con enumeración personalizada */
+#main-stats-list {
+  list-style: none;
+  padding: 0;
+  counter-reset: stats-counter;
+}
+
+#main-stats-list li {
+  counter-increment: stats-counter;
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  border-left: 4px solid #0056b3;
+}
+
+/* Número en recuadro */
+#main-stats-list li::before {
+  content: counter(stats-counter);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  margin-right: 15px;
+  background-color: #0056b3;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+#main-stats-list li strong {
+  color: #0056b3;
+  margin-right: 5px;
+}
