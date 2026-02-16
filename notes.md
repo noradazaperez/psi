@@ -394,7 +394,7 @@ del request.session['my_car']
 - Authentication View: login, log out, and password management.
 - Password reset templates.
 
-- Qué podemos hacere para controlar selctivamente el contenido que el usuario ve basado en si ha iniciado sesión o no
+- Qué podemos hacer para controlar selctivamente el contenido que el usuario ve basado en si ha iniciado sesión o no
 ```html
 {% if user.is_authenticated %}
 ```
@@ -402,3 +402,5 @@ del request.session['my_car']
 - Nótese también cómo hemos añadido ?next={{request.path}} al final de las URLs. 
     * añadir el párametro URL next que contiene la dirección (URL) de la página actual, al final de la URL enlazada
     * Después de que el usuario haya iniciado o cerrado sesión con éxito, las vistas usarán el valor de este "next" para redirigir al usuario de vuelta a la página donde pincharon primeramente el enlace de inicio/cierre de sesión.
+
+- If you're using function-based views, the easiest way to restrict access to your functions is to apply the login_required decorator to your view function, as shown below. If the user is logged in then your view code will execute as normal. If the user is not logged in, this will redirect to the login URL defined in the project settings (settings.LOGIN_URL), passing the current absolute path as the next URL parameter. 
