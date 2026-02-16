@@ -1,0 +1,47 @@
+Material a entregar:
+    Dos proyectos: tutorial-vue, persona
+        Mejor si ambos están en un único repositorio
+    Desplegado en render.com
+    Incluir el .git
+
+Pasos:
+    Vue.js setup
+        npm init vue@3.4 ¡nombre del proyecto!
+            Opciones por las que te pregunta
+                TypeScript
+                    Para usar javascript tipado (decir no)
+                JSK Support
+                    No 
+                Vue ROuter for Single Page Application developement
+                    Yes
+                    Lo hace es descargarse absolutamente toda la información de la página y no medir más cosas
+                Pinia
+                    No
+                    Es para manejo de sesiones
+                Tests
+                    No 
+                ESLint
+                    Yes, nos lo piden
+        cd ¡nombre proyecto!
+        npm install
+            Un poco como lo de requirements.txt
+        npm run dev
+            Te echa a correr el servidor
+    Empezar a hacer cosas
+        App.vue
+            Las variables en html también van entre {{}}
+
+    
+
+Notas:
+    node_modules
+        Es como el venv de python, no subirlo
+    App.vue 
+        Las variables declaradas con ref, cada vez q las modificas, te acutalizan el html mostrado
+            import { ref } from Vue
+    El mappeo entre urls y vistas es en router/index.js
+        Para ponerle variables es /:¡nombre variable!
+            Para acceder al valor de la variable es route.params.name
+        Para q efectivamente te mappee hay q poner en el template
+            < router-view />
+
