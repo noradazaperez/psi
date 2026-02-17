@@ -1045,3 +1045,33 @@ Submit sube toda la información de todos los campos. Por defecto, será un bot�
 Action es el link al q subirán la información
 Method es cómo se subirán los datos
     Poner siempre POST, a no ser q la información no edite nada del servidor y quieres q sea un resultado compartible (*) una búsqueda
+
+# Desplegar
+
+### Whitenoise
+Lo q hace:
+- Intercepts requests
+- Checks if the request is for a static file
+- Serves the file directly
+- Bypasses Django views
+
+python3 manage.py collectstatic
+- Collects all static files into STATIC_ROOT
+   - WhiteNoise then:
+    - Scans that directory at startup
+    - Builds an internal file index
+    - Optionally pre-compresses files
+
+Pasos para añadirlo:
+    middleware
+    STATIC_URL = "/static/"
+        Comienzo de la direcchión donde el buscador pedirá los archivos estáticos
+    STATIC_ROOT = BASE_DIR / "staticfiles"
+        Carpeta donde Django pondrá los archivos estáticos al correr django collectstatic blabla
+    STORAGES = {
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+        Para comprimir
+        Renombra los archivos con hashes, para q se mantengan más tiempo en la caché y q cambie el nombre cuando cambien los archivos

@@ -42,7 +42,7 @@ Desplegar la aplicación:
 			python3 manage.py collectstatic --noinput
 				- Carga los archivos estáticos
 				- Again, no entiendo
-		En el proyect root hay que poner la ruta a la carpeta donde esté el fichero manage.py, sin el archivo
+		En el project root hay que poner la ruta a la carpeta donde esté el fichero manage.py, sin el archivo
 			
 	Neon.tech
 		Este es el que lo usaremos para las bases de datos
@@ -57,6 +57,6 @@ Correr el proyecto:
 		Te pone a correr el servidor en el número de puerto dado
 
 STATIC_URL
-	la dirección de los ficheros estáticos. Es decir, cuando accedes a localhost/¡esta dirección!, te devuelven todos los ficheros que están en la carpeta definida en STATTIC_ROOT
+	la dirección de los ficheros estáticos. Es decir, cuando accedes a localhost/¡esta dirección!, te devuelven todos los ficheros que están en la carpeta definida en STATIC_ROOT
 STATIC_ROOT
 	Dirección en el disco duro donde están los archivos estáticos que servirá
