@@ -59,6 +59,23 @@ const persona = ref({
     apellido: '',
     email: '',
 });
+
+const personas = ref([])
+
+const agregarPersona = (persona) => {
+  let id = 0;
+  if (personas.value.length > 0) {
+    id = personas.value[personas.value.length - 1].id + 1;
+  }
+  personas.value = [...personas.value, {...persona, id}];
+}
+
+const emit = defineEmits(['add-persona'])
+const enviarFormulario = () => {
+  console.log('Works!');
+  emit('add-persona', persona.value)
+}
+
 </script>
 
 <style scoped>

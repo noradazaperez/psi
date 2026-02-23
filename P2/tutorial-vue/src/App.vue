@@ -6,7 +6,7 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-          <formulario-persona /> <!-- NUEVO -->
+          <formulario-persona @add-persona="agregarPersona"/> <!-- NUEVO -->
           <tabla-personas :personas="personas" />
         </div>
     </div>
