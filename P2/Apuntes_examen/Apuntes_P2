@@ -25,6 +25,7 @@ Pasos:
         cd ¡nombre proyecto!
         npm install
             Un poco como lo de requirements.txt
+            Tarda la vida y media
         npm run dev
             Te echa a correr el servidor
     Empezar a hacer cosas
