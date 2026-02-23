@@ -25,7 +25,6 @@ Pasos:
         cd ¡nombre proyecto!
         npm install
             Un poco como lo de requirements.txt
-            Tarda la vida y media
         npm run dev
             Te echa a correr el servidor
     Empezar a hacer cosas
@@ -45,4 +44,15 @@ Notas:
             Para acceder al valor de la variable es route.params.name
         Para q efectivamente te mappee hay q poner en el template
             < router-view />
+
+
+Instalar node_modules:
+    Si pones npm install --preffix ¡dirección donde instalar! te instala ahí las dependencias
+    Para q las busque ahí, poner el preffix en todas las instrucciones
+    Sirve para, por ejemplo, instalarte las dependencias en un USB
+        No parece haber otra solución
+
+
+        PREGS:
+            La cosa esa rara de las propiedades y los componentes
 
