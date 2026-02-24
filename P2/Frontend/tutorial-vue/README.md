@@ -1,3 +1,5 @@
+[ ] Mejorar los apuntes de Formularios
+Dejado justo antes de la sección 1.9.4 (lo de antes está, esa sección no)
 # tutorial-vue
 
 This template should help get you started developing with Vue 3 in Vite.

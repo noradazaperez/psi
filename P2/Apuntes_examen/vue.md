@@ -72,6 +72,32 @@ const props = defineProps({
 </tr>
 ```
 
+```html 
+<!--Se mostrará sólo si se cumple la condición-->
+<div
+  v-if="error && procesando"
+  class="alert alert-danger"
+  role="alert"
+>
+  Debes rellenar todos los campos!
+</div>
+```
+También es posible usar sentencias v-else o v-else-if
+
+Se puede definir condicionalmente la clase de un componente:
+  La clase css el componente será la primera cuya condición asociada sea verdad
+```html 
+<input
+v-model="persona.email"
+type="email"
+class="form-control"
+data-cy="email"
+:class="{ 'is-invalid': procesando && emailInvalido }"
+@focus="resetEstado"
+>
+<!--focus es un event y resetEstado es el listener-->
+```
+
 # Componentes
 **Persona**
 Crear en la carpeta src/components
@@ -80,7 +106,10 @@ El nombre del componente dentro del archivo debe estar en kebab-case
 
 ### En el fichero del componente
 Estructura del script
+Si pones el setup importa automáticamente las funcionas q definas en el componente  cuando pongas import ¡cosas para importar componente!
+  Sin necesidad de q lo pongas en el return
 ```javascript
+<script setup>
 // definicion del componente
 defineOptions({
   // nombre del componente
@@ -108,6 +137,51 @@ Agregar <¡nombre del componente en kebab-case! :¡nombre variable a pasarle al 
 ### Formularios
 
 Ver @/components/FormularioPersonas.vue
+```html
+<input
+ref="nombre" <!-- Referencia al elemento input con nombre 'nombre' -->
+v-model="persona.nombre" <!-- Vinculacion bidireccional con la propiedad
+ 'nombre' de la variable reactiva 'persona' -->
+type="text" <!-- Tipo de input: texto -->
+class="form-control" <!-- Clase de Bootstrap para estilos de formulario -->
+data-cy="name" <!-- Atributo para pruebas automatizadas (Cypress) -->
+:class="{ 'is-invalid': procesando && nombreInvalido }" <!-- Clase condicional -->
+@focus="resetEstado" <!-- Evento al obtener el foco -->
+/>
+```
+
+También hay ahí la información de validación
+
+
+### Pasar informacion entre hijos y padres
+
+**Desde el hijo hacia el padre**
+
+*En el documento hijo:*
+Si es desde el script
+```javascript
+// Le dice a vue q vas a definir un evento
+const emit = defineEmits(['add-persona']);
+
+const enviarFormulario = () => {
+    console.log('Works!');
+    // Emite un evento llamado 'add-persona' con el valor de la variable persona
+    emit('add-persona', persona.value);
+  };
+```
+Es importante usar kebab-case
+
+Si es desde el template
+```html
+<button class="btn btn-danger" @click="$emit('delete-persona', persona.id)" >&#x1F5D1; Eliminar<button>
+<!-- Emite un evento delete-persona con el parámetro persona.id-->
+```
+
+*En el documento padre*
+Para escuchar al evento tienes q añadir una propiedad al template del componente con el nombre del evento:
+(*) <formulario-persona @add-persona="agregarPersona" />
+  Donde agregarPersona es el nombre del event listener en camelCase
+
 
 # Script 
 
@@ -135,7 +209,7 @@ Te predefinen algunos elementos q puedas usar
 **Bootstrap**
 Añadirlo al proyecto:
 En src/main.js:
-```javascript
+```
 import "../node_modules/bootstrap/dist/js/bootstrap.js";
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
 ```

@@ -5,8 +5,8 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-          <formulario-persona /> <!-- NUEVO -->
-          <tabla-personas :personas="personas" />
+          <formulario-persona @add-persona="agregarPersona" /> <!-- NUEVO -->
+          <tabla-personas :personas="personas" @delete-persona="eliminarPersona"/>
         </div>
     </div>
     </div>
@@ -23,26 +23,26 @@ defineOptions({
   name: 'app',
 });
 // Declaracion de una variable reactiva "personas" usando "ref"
-const personas = ref([
-  {
-    id: 1,
-    nombre: 'Jon',
-    apellido: 'Nieve',
-    email: 'jon@email.com',
-  },
-  {
-    id: 2,
-    nombre: 'Tyrion',
-    apellido: 'Lannister',
-    email: 'tyrion@email.com',
-  },
-  {
-    id: 3,
-    nombre: 'Daenerys',
-    apellido: 'Targaryen',
-    email: 'daenerys@email.com',
-  },
-]);
+const personas = ref([]);
+
+const agregarPersona = (persona) => {
+  let id = 0;
+
+  if (personas.value.length > 0) {
+    id = personas.value[personas.value.length - 1].id + 1;
+  }
+  personas.value = [...personas.value, { ...persona, id }];
+};
+
+const eliminarPersona = (id) => {
+  try {
+    personas.value = personas.value.filter(
+      u => u.id !== id
+    );
+  } catch(error) {
+    console.error(error);
+  }
+};
 </script>
 
 <style>
