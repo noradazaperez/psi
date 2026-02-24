@@ -120,7 +120,7 @@ import FormularioPersona from '@/components/FormularioPersona.vue'
     <formulario-persona @add-persona="agregarPersona"/>
 
     ```
-    3. Creamos el método agregarPersona en el setUp
+    3. Creamos el método agregarPersona en el script de `App.vue`
         * método de propagación ... útil para combinar objetos y arrays 
 
 
@@ -129,4 +129,17 @@ import FormularioPersona from '@/components/FormularioPersona.vue'
 - Propiedades computadas de `Vue.js`
     * Los datos se suelen validar mediante **propiedades computadas**
     * Funciones que se ejecutan automáticamente cuando se modifica el estado de alguna propiedad
-     
+- Se agrega en el interior del método setUp del componente FormularioPersona
+
+- Sentencias condicionales con `Vue.js`
+    * Se agregue la clase CSS has-error a los campos en función de si han fallado o no
+        - La sentencia `:class="{'is-invalid': procesando && nombreInvalido}"` añade la clase is-valid si procesando 
+        y nombreInvalido valen true
+
+    * `v-if` : hace que el elemento en el que se incluya solamente se muestre si la condición especificada se evalúa como true
+
+
+- Referencias con `Vue.js`
+    * El foco + cursor se sitúen en el primer elemento del formulario 
+
+### Elimina elementos con Vue.js

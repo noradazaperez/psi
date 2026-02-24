@@ -7,7 +7,7 @@ import App from './App.vue'
 
 // IMPORTANTE: Puedes querer limpiar el archivo main.css por defecto
 // ya que las opciones por defecto pueden no satisfacerte.
-import './assets/main.css'
+//import './assets/main.css'
 
 const app = createApp(App)
 
