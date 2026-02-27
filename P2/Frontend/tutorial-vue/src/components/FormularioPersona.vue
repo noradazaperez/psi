@@ -53,13 +53,18 @@
             </div>
           </div>
         </div>
-        <br />
+        <br>
         <!-- Segunda fila con un boton para agregar persona -->
         <div class="row">
           <div class="col-md-4">
             <div class="form-group">
               <!-- Boton para agnadir persona -->
-              <button class="btn btn-primary" data-cy="add-button">Agnadir persona</button>
+              <button
+                class="btn btn-primary"
+                data-cy="add-button"
+              >
+                Agnadir persona
+              </button>
             </div>
           </div>
         </div>
@@ -90,28 +95,28 @@
 </template>
 
 <script setup>
-import { ref, computed, getCurrentInstance, onMounted } from 'vue';
+import { ref, computed, getCurrentInstance, onMounted } from "vue";
 
 // definicion del componente
 defineOptions({
-    // nombre del componente
-    name: 'formulario-persona',
+  // nombre del componente
+  name: "FormularioPersona",
 });
 
 const procesando = ref(false);
 const correcto = ref(false);
-const error = ref(false);  
-const instance = getCurrentInstance(); 
+const error = ref(false);
+const instance = getCurrentInstance();
 
 const nombre = ref(null);
 // Declaracion de una variable reactiva "persona" con propiedades nombre, apellido y email
 const persona = ref({
-    nombre: '',
-    apellido: '',
-    email: '',
+  nombre: "",
+  apellido: "",
+  email: "",
 });
 
-const emit = defineEmits(['add-persona']);
+const emit = defineEmits(["add-persona"]);
 
 const enviarFormulario = () => {
   procesando.value = true;
@@ -124,16 +129,15 @@ const enviarFormulario = () => {
   }
 
   // Emite un evento llamado 'add-persona' con el valor de la variable persona
-  emit('add-persona', persona.value);
+  emit("add-persona", persona.value);
   const input = instance.refs.nombre;
   input?.focus();
 
-
   // Limpiamos el formulario
   persona.value = {
-    nombre: '',
-    apellido: '',
-    email: '',
+    nombre: "",
+    apellido: "",
+    email: "",
   };
 
   error.value = false;
@@ -148,8 +152,8 @@ const resetEstado = () => {
 
 onMounted(() => {
   // Enfocamos el campo nombre al montar el componente
-    const input = instance.refs.nombre;
-    input?.focus();
+  const input = instance.refs.nombre;
+  input?.focus();
 });
 
 // validación de los campos del formulario
@@ -161,6 +165,6 @@ const emailInvalido = computed(() => persona.value.email.length < 1);
 <style scoped>
 /* Estilos especificos del componente con el modificador "scoped" */
 form {
-    margin-bottom: 2rem;
+  margin-bottom: 2rem;
 }
-</style>  
+</style>

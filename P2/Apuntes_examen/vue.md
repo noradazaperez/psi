@@ -203,6 +203,15 @@ const personas = ref([
 ]);
 ```
 
+# Tests 
+
+Abrir Cypress
+```bash
+npx cypress open
+```
+
+Usamos E2E testing
+
 # Frameworks
 Te predefinen algunos elementos q puedas usar
 
