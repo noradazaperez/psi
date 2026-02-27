@@ -12,4 +12,3 @@ Extensiones para trabajar con Vue.js
 - Me salen errores en la consola por lo de DevTools
     He comentado linea 11 de main.js y linea 15 de Vite.config.js
 - He corrido los tests y los apruebo, eso es todo lo q tengo q hacer? (No se crearlos yo)
-- eslintrc.cjs ya tenía contenido y lo he mantenido, bien?
