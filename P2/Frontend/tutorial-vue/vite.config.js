@@ -12,7 +12,7 @@ export default defineConfig({
     },
   },
   define: {
-    //__VUE_PROD_DEVTOOLS__: true
+    __VUE_PROD_DEVTOOLS__: true
     // Enable Vue Devtools in production CAREFUL
   },
 });

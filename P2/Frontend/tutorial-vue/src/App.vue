@@ -1,3 +1,4 @@
+<!-- -->
 <template>
   <div
     id="app"
@@ -11,7 +12,6 @@
     <div class="row">
       <div class="col-md-12">
         <formulario-persona @add-persona="agregarPersona" />
-        <!-- NUEVO -->
         <tabla-personas
           :personas="personas"
           @delete-persona="eliminarPersona"
@@ -23,50 +23,86 @@
 </template>
 
 <script setup>
-import TablaPersonas from "@/components/TablaPersonas.vue";
-import FormularioPersona from "@/components/FormularioPersona.vue";
-import { ref } from "vue";
+import TablaPersonas from '@/components/TablaPersonas.vue'
+import FormularioPersona from '@/components/FormularioPersona.vue'
+import { ref, onMounted } from 'vue';
 
-// definicion del componente
+import { useCounterStore } from '@/stores/counter'; // usar en método correspondiente
+
+const store = useCounterStore();
+
 defineOptions({
-  // nombre del componente
-  name: "App",
+  name: 'app',
 });
-// Declaracion de una variable reactiva "personas" usando "ref"
+
 const personas = ref([]);
 
-const agregarPersona = (persona) => {
-  let id = 0;
+const api_link = 'http://localhost:8000/api/v1/personas';
 
-  if (personas.value.length > 0) {
-    id = personas.value[personas.value.length - 1].id + 1;
-  }
-  personas.value = [...personas.value, { ...persona, id }];
+const listadoPersonas = async () => {
+  // Metodo para obtener un listado de personas
+  try {
+    const response = await fetch(api_link);
+    personas.value = await response.json();
+  } catch (error) {
+    console.error(error);
+  }      
 };
 
-const eliminarPersona = (id) => {
+const agregarPersona = async (persona) => {
   try {
-    personas.value = personas.value.filter((u) => u.id !== id);
+    const response = await fetch(api_link, {
+      method: 'POST',
+      body: JSON.stringify(persona),
+      headers: { 'Content-type': 'application/json; charset=UTF-8' },
+    });
+    
+    const personaCreada = await response.json();
+    personas.value = [...personas.value, personaCreada];
+    store.increment()
   } catch (error) {
     console.error(error);
   }
 };
 
-const actualizarPersona = (id, personaActualizada) => {
+const eliminarPersona = async (persona_id) => {
+  // Metodo para eliminar una persona
   try {
-    personas.value = personas.value.map((persona) =>
-      persona.id === id ? personaActualizada : persona
-    );
+    await fetch(api_link+persona_id+'/', {
+      method: "DELETE"
+    });
+    
+    personas.value= personas.value.filter(u => u.id !== persona_id);
   } catch (error) {
     console.error(error);
-  }
+  }      
 };
+
+const actualizarPersona = async (id, personaActualizada) => {
+  // Metodo para actualizar una persona
+  try {
+      const response = await fetch(api_link+personaActualizada.id+'/', {
+          method: 'PUT',
+          body: JSON.stringify(personaActualizada),
+            headers: { 'Content-type': 'application/json; charset=UTF-8' },
+          });
+
+      const personaActualizadaJS = await response.json();
+      personas.value = personas.value.map(u => (u.id === personaActualizada.id ? personaActualizadaJS : u));         
+  } catch (error) {
+    console.error(error);
+  }      
+};
+
+// Fetch data when the component is mounted
+onMounted(() => {
+  listadoPersonas();
+});
 </script>
 
 <style>
-/* Estilos globales para todos los elementos button en la aplicacion */
-button {
-  background: #009435;
-  border: 1px solid #009435;
-}
+  button {
+    background: #009435;
+    border: 1px solid #009435;
+  }
 </style>

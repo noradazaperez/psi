@@ -2,13 +2,20 @@
 import { createApp } from "vue";
 
 // Importa el componente principal App desde el archivo App.vue
-import App from "./App.vue";
+import App from './App.vue'
+import { createPinia } from 'pinia'
 
-// Crea una instancia de la aplicacion Vue y monta el
-// componente App en el elemento con el ID 'app'
-createApp(App).mount("#app");
 
-//app.config.devtools = true // Enable devtools in production (use with caution)
+// Crea una instancia de la aplicacion Vue
+const myapp = createApp(App)
+const pinia = createPinia() 
+
+myapp.use(pinia)
+// monta el componente App en el elemento con el ID 'app'
+
+myapp.mount('#app')
+
+app.config.devtools = true // Enable devtools in production (use with caution)
 
 // Las dos lineas siguientes haran que Bootstrap este disponible para tu
 // aplicacion si Bootstrap ha sido instalado.
