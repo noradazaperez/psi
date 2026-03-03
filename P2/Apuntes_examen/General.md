@@ -19,11 +19,16 @@ Tests
         div#¡algo! te busca por id 
         div.¡algo! te busca por clase
 
+# Examen
+Coger el examen del año anterior
+Opciones: hacer un test, añadir un modelo al api rest, añadir una vista o modificar una existente
+También tendremos que hacer un populate
+
 # Pregs
 - Me salen errores en la consola por lo de DevTools
-    He comentado linea 11 de main.js y linea 15 de Vite.config.js
+    HERE:::
 - He corrido los tests y los apruebo, eso es todo lo q tengo q hacer? (No se crearlos yo)
     @ Sí q hay q saber hacer tests de cypress
-- Error en lo del CORS
-    - Q es y por q hay q habilitarlo en el backend y no el frontend?
-- Los cambios de enunciado
+- Los cambios de enunciado de los pdfs
+- No entiendo lo q es stores
+- Si hay un error se guarda anyways

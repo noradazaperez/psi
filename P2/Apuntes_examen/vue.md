@@ -27,6 +27,8 @@ main.js
         mount('#app')
             “renderiza” en un elemento HTML de nuestra página la aplicación
             El elemento será el div q tenga id 'app'
+router/index.js
+    Es como el urls.py de django
 
 En un archivo, usar el @ en las direcciones hace referencia al directorio src 
 
@@ -228,3 +230,7 @@ E instalarlo en node, desde la raíz del proyecto:
 npm install bootstrap@5.3.3
 npm install @popperjs/core@2.11.8
 ```
+
+# router
+Linkear a otra página en la app:
+<a class="button" ><router-link to="/faq">Click to access FAQ</router-link></a>

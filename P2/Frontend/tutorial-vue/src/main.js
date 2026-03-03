@@ -3,6 +3,7 @@ import { createApp } from "vue";
 
 // Importa el componente principal App desde el archivo App.vue
 import App from './App.vue'
+import router from './router'
 import { createPinia } from 'pinia'
 
 
@@ -11,11 +12,11 @@ const myapp = createApp(App)
 const pinia = createPinia() 
 
 myapp.use(pinia)
+myapp.use(router)
 // monta el componente App en el elemento con el ID 'app'
-
 myapp.mount('#app')
 
-app.config.devtools = true // Enable devtools in production (use with caution)
+// HERE::: app.config.devtools = true // Enable devtools in production (use with caution)
 
 // Las dos lineas siguientes haran que Bootstrap este disponible para tu
 // aplicacion si Bootstrap ha sido instalado.
