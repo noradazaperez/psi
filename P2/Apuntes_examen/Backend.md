@@ -161,3 +161,4 @@ No necesitamos configurar nada de whitenoise porq no tenemos ficheros estáticos
 5. Ir a neon.tech, crear base de datos.
 6. Darle a connect a esa base de datos, copiar url
 7. Meter ese url en render
+8. PUSH

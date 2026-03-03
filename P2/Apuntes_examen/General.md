@@ -1,3 +1,7 @@
+Estoy desplegando la aplicación
+Acabo de desplegar el backend (sin probar), me falta probarlo y conectar el frontend al backend y desplegar la nueva versión de la app con ambas conectadas
+Ver lo q es stores
+
 # Apts de clase
 
 Primera semana  para el primer pdf, segunda semana para el segundo pdf
@@ -32,7 +36,8 @@ También tendremos que hacer un populate
     @ Sí q hay q saber hacer tests de cypress
 - Los cambios de enunciado de los pdfs
     @ Buscar los subrayados en rojo del documento. Secciones 1.7.3 y 1.8.2 del pdf 1
-- No entiendo lo q es stores
 - Si hay un error se guarda anyways
     @ No pasa nada, se deja así y listo
+
+- No entiendo lo q es stores
 - La última línea del segundo pdf
