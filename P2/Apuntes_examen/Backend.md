@@ -91,3 +91,73 @@ REST_FRAMEWORK = {
 
 convierte el API a sólo lectura para visitantes no autenticados
     Sólo los usuarios identificados podrán acceder a las acciones de creación, modificación y borrado
+
+# Desplegar django
+
+No necesitamos configurar nada de whitenoise porq no tenemos ficheros estáticos
+
+1. En settings.py cambiar las siguientes variables a coger valores de env
+    DATABASE_URL 
+    DEBUG
+    SECRET_KEY
+        QUITARLA DE GH!!!!
+    1.1 Importar env 
+    ```python
+    import os
+    # Support env variables from .env file if defined
+    from dotenv import load_dotenv
+
+    # Build paths inside the project like this: BASE_DIR / 'subdir'.
+    BASE_DIR = Path(__file__).resolve().parent.parent
+
+    env_path = load_dotenv(os.path.join(BASE_DIR, '.env'))
+    load_dotenv(env_path)
+    ```
+    1.2 Importar dj_database_url
+    ```python
+    import dj_database_url
+    ```
+    1.3 Importar la variable específica del env 
+    ```python
+    SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY',
+                            '&p5l=p3q8_a+-$4w1f^lt3lx1c@d*p4x$ymm_rn7pwb87')
+
+    DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+
+    DATABASES = {
+        'default': dj_database_url.config(
+            conn_max_age=600,
+            conn_health_checks=True,
+        ),
+    }
+
+    # No olvidar import dj_database_url
+
+    db_from_env = dj_database_url.config(
+                                        default=os.environ.get('DATABASE_URL'),
+                                        conn_max_age=500)
+
+    DATABASES['default'].update(db_from_env)
+    ```
+    1.4 Crear el .env en local con los valores
+    DATABASE_URL = 'postgres://alumnodb:alumnodb@localhost:5432/psi'
+    DEBUG = 'True'
+        
+2. Cambiar lo de ALLOWED_HOSTS
+    ```python
+    ALLOWED_HOSTS = []
+
+    RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+    if RENDER_EXTERNAL_HOSTNAME:
+        ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    ```
+
+3. Ir a render y darle a crear proyecto 
+    Build command q sea pip install -r requirements.txt
+    Start command guinicorn ¡nombre proyecto!.wsgi.¡nombre aplicación!
+4. Crear variables de environment
+    SECRET_KEY     Decirle q te la genere
+    DATABASE_URL -> Ahora la añadiremos
+5. Ir a neon.tech, crear base de datos.
+6. Darle a connect a esa base de datos, copiar url
+7. Meter ese url en render

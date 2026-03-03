@@ -130,8 +130,7 @@ const enviarFormulario = () => {
 
   // Emite un evento llamado 'add-persona' con el valor de la variable persona
   emit("add-persona", persona.value);
-  const input = instance.refs.nombre;
-  input?.focus();
+  nombre.value?.focus();
 
   // Limpiamos el formulario
   persona.value = {
@@ -152,8 +151,7 @@ const resetEstado = () => {
 
 onMounted(() => {
   // Enfocamos el campo nombre al montar el componente
-  const input = instance.refs.nombre;
-  input?.focus();
+  nombre.value?.focus();
 });
 
 // validación de los campos del formulario

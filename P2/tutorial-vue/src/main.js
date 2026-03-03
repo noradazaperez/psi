@@ -16,7 +16,7 @@ myapp.use(router)
 // monta el componente App en el elemento con el ID 'app'
 myapp.mount('#app')
 
-// HERE::: app.config.devtools = true // Enable devtools in production (use with caution)
+myapp.config.devtools = true // Enable devtools in production (use with caution) // HERE::: 
 
 // Las dos lineas siguientes haran que Bootstrap este disponible para tu
 // aplicacion si Bootstrap ha sido instalado.

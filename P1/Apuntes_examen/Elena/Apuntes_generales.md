@@ -83,5 +83,8 @@ Render.com
         if RENDER_EXTERNAL_HOSTNAME:
             ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
+7. Crear página en render
+
+
 ## Pregs
 
