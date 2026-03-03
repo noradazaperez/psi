@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "eslint-plugin-vue": "^10.8.0",
     "vue": "3.4"
+  },
+  "scripts": {
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1"
   }
 }

@@ -143,3 +143,95 @@ import FormularioPersona from '@/components/FormularioPersona.vue'
     * El foco + cursor se sitúen en el primer elemento del formulario 
 
 ### Elimina elementos con Vue.js
+- Agregar una columna en la tabla que permita borrar una línea en la tabla
+```html
+        <td>
+            <!-- &#x1F5D1; is the wastebasket icon. Icons available at https://codepoints.net -->
+            <button class="btn btn-danger">&#x1F5D1; Eliminar</button>
+        </td>
+
+```
+- Añadir un método para borrar el elemento en `App.vue`
+- Hemos usado el método filter, que conservará aquellos elementos del array
+    personas cuyo id no sea el indicado. Y con esto, si consultas el navegador, podrás
+    comprobar que las personas se eliminan de la tabla al pulsar el botón de su respectiva
+    fila:
+
+- **Agrega mensajes informativos**: 
+
+### Edita elementos con `Vue.js`:
+
+1. Añadir un botón
+```html
+<button class="btn btn-info ml-2" @click="editarPersona(persona)">&#x1F58A; Editar</button>
+```
+
+2. Añadir un método de edición
+
+```html
+const editando = ref(null);
+const personaEditada = ref(null);
+const editarPersona = (persona) => {
+    personaEditada.value = { ...persona };
+    editando.value = persona.id;
+};
+
+```
+
+3. Añadir campo de edición
+4. Agrega un botón de edición
+5. Emite el evento de guardado
+6. Agrega un método que cancele la dición
+7. Recibe el evento de actualización en la aplicación
+* En app.vue tengo que definiri actualizarpersona
+
+```html
+<!-- App.vue -->
+const actualizarPersona = (id, personaActualizada) => {
+    try {
+        personas.value = personas.value.map(persona =>
+        persona.id === id ? personaActualizada : persona);
+    }
+    catch(error){
+        console.error(error);
+    }
+}
+
+```
+
+### Testing de la aplicación `Vue.js`
+
+
+- Abrir entorno de Cypress
+```bash
+npx cypress open
+```
+
+- *Nota*: Si en algún momento recibes un error indicando que Cypress no se puede conectar
+al servidor (porque está usando el puerto 4173 en lugar del 5173), simplemente debes
+cambiar la variable baseUrl del fichero cypress.config.js.
+
+
+### Estilo de la aplicación `Vue.js`
+
+- Se va a validar el estilo de la práctica utilizando la librería ESLint
+
+- Incluir en el archivo `package.json`:
+
+```
+"lint": 
+```
+
+- Crear el archivo `.eslintrc.js`
+- Ejecutamos: 
+```bash
+npm run lint
+```
+
+
+### Build + Deploy de la aplicación `Vue.js`
+* Build de la aplicación: `npm run build`
+* 
+
+
+

@@ -1,48 +1,52 @@
 <!-- App.vue -->
 <template>
-    <div id="app" class="container">
+  <div id="app" class="container">
     <div class="row">
-        <div class="col-md-12"><h1>Personas</h1></div>
+      <div class="col-md-12"><h1>Personas</h1></div>
     </div>
     <div class="row">
-        <div class="col-md-12">
-          <formulario-persona @add-persona="agregarPersona"/> 
-          <tabla-personas :personas="personas" />
-        </div>
+      <div class="col-md-12">
+        <formulario-persona @add-persona="agregarPersona" />
+        <tabla-personas
+          :personas="personas"
+          @delete-persona="eliminarPersona"
+          @actualizar-persona="actualizarPersona"
+        />
+      </div>
     </div>
-    </div>
+  </div>
 </template>
 
 <script setup>
-import TablaPersonas from '@/components/TablaPersonas.vue'
+import TablaPersonas from "@/components/TablaPersonas.vue";
 // NUEVO:
-import FormularioPersona from '@/components/FormularioPersona.vue'
-import { ref } from 'vue';
+import FormularioPersona from "@/components/FormularioPersona.vue";
+import { ref } from "vue";
 
 // definicion del componente
 defineOptions({
   // nombre del componente
-  name: 'app',
+  name: "app",
 });
 // Declaracion de una variable reactiva "personas" usando "ref"
 const personas = ref([
   {
     id: 1,
-    nombre: 'Jon',
-    apellido: 'Nieve',
-    email: 'jon@email.com',
+    nombre: "Jon",
+    apellido: "Nieve",
+    email: "jon@email.com",
   },
   {
     id: 2,
-    nombre: 'Tyrion',
-    apellido: 'Lannister',
-    email: 'tyrion@email.com',
+    nombre: "Tyrion",
+    apellido: "Lannister",
+    email: "tyrion@email.com",
   },
   {
     id: 3,
-    nombre: 'Daenerys',
-    apellido: 'Targaryen',
-    email: 'daenerys@email.com',
+    nombre: "Daenerys",
+    apellido: "Targaryen",
+    email: "daenerys@email.com",
   },
 ]);
 
@@ -52,14 +56,32 @@ const agregarPersona = (persona) => {
   if (personas.value.length > 0) {
     id = personas.value[personas.value.length - 1].id + 1;
   }
-  personas.value = [...personas.value, {...persona, id}];
-}
+  personas.value = [...personas.value, { ...persona, id }];
+};
+
+const eliminarPersona = (id) => {
+  try {
+    personas.value = personas.value.filter((u) => u.id !== id);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const actualizarPersona = (id, personaActualizada) => {
+  try {
+    personas.value = personas.value.map((u) =>
+      u.id === id ? personaActualizada : u
+    );
+  } catch (error) {
+    console.error(error);
+  }
+};
 </script>
 
 <style>
-    /* Estilos globales para todos los elementos button en la aplicacion */
-    button {
-    background: #009435;
-    border: 1px solid #009435;
-    }
+/* Estilos globales para todos los elementos button en la aplicacion */
+button {
+  background: #009435;
+  border: 1px solid #009435;
+}
 </style>
