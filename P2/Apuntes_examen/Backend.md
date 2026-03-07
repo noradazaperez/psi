@@ -147,11 +147,12 @@ No necesitamos configurar nada de whitenoise porq no tenemos ficheros estáticos
 
 3. Ir a render y darle a crear proyecto 
     Build command q sea pip install -r requirements.txt
-    Start command guinicorn ¡nombre proyecto!.wsgi.¡nombre aplicación!
+    Start command guinicorn ¡nombre proyecto!.wsgi:application
 4. Crear variables de environment
     SECRET_KEY     Decirle q te la genere
     DATABASE_URL -> Ahora la añadiremos
 5. Ir a neon.tech, crear base de datos.
 6. Darle a connect a esa base de datos, copiar url
 7. Meter ese url en render
+    Debería no tener ' y empezar con postrges. (*) postgresql://neondb_ow
 8. PUSH

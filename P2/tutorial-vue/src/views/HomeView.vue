@@ -40,7 +40,7 @@ defineOptions({
 
 const personas = ref([]);
 
-const api_link = 'http://localhost:8000/api/v1/personas/';
+const api_link = import.meta.env.VITE_DJANGOURL;
 
 const listadoPersonas = async () => {
   // Metodo para obtener un listado de personas
