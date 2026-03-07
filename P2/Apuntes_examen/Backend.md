@@ -144,6 +144,12 @@ No necesitamos configurar nada de whitenoise porq no tenemos ficheros estáticos
     if RENDER_EXTERNAL_HOSTNAME:
         ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
     ```
+2.1 Añadir el frontend como a los headers de cors:
+CORS_ORIGIN_WHITELIST = [
+    'http://127.0.0.1:5173',
+    'http://localhost:5173',
+    'https://two-tutorial-vue-08-2404-2026-1.onrender.com/' # O el q sea
+]
 
 3. Ir a render y darle a crear proyecto 
     Build command q sea pip install -r requirements.txt
