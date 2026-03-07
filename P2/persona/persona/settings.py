@@ -74,6 +74,7 @@ CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = [
     'http://127.0.0.1:5173',
     'http://localhost:5173',
+    'https://two-tutorial-vue-08-2404-2026-1.onrender.com/'
 ]
 
 ROOT_URLCONF = 'persona.urls'
