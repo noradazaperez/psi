@@ -123,21 +123,14 @@ No necesitamos configurar nada de whitenoise porq no tenemos ficheros estáticos
                             '&p5l=p3q8_a+-$4w1f^lt3lx1c@d*p4x$ymm_rn7pwb87')
 
     DEBUG = os.environ.get('DEBUG', 'True') == 'True'
-
-    DATABASES = {
-        'default': dj_database_url.config(
-            conn_max_age=600,
-            conn_health_checks=True,
-        ),
-    }
-
     # No olvidar import dj_database_url
 
-    db_from_env = dj_database_url.config(
-                                        default=os.environ.get('DATABASE_URL'),
-                                        conn_max_age=500)
-
-    DATABASES['default'].update(db_from_env)
+    DATABASES = {
+    'default': dj_database_url.config(
+                                    default=os.environ.get('DATABASE_URL'),
+                                    conn_max_age=500)
+    ,
+    }
     ```
     1.4 Crear el .env en local con los valores
     DATABASE_URL = 'postgres://alumnodb:alumnodb@localhost:5432/psi'
