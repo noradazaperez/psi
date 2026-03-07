@@ -122,7 +122,7 @@ No necesitamos configurar nada de whitenoise porq no tenemos ficheros estáticos
     SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY',
                             '&p5l=p3q8_a+-$4w1f^lt3lx1c@d*p4x$ymm_rn7pwb87')
 
-    DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+    DEBUG = os.environ.get('DEBUG', 'False') == 'True'
     # No olvidar import dj_database_url
 
     DATABASES = {
@@ -148,7 +148,7 @@ No necesitamos configurar nada de whitenoise porq no tenemos ficheros estáticos
 CORS_ORIGIN_WHITELIST = [
     'http://127.0.0.1:5173',
     'http://localhost:5173',
-    'https://two-tutorial-vue-08-2404-2026-1.onrender.com/' # O el q sea
+    'https://two-tutorial-vue-08-2404-2026-1.onrender.com' # O el q sea
 ]
 
 3. Ir a render y darle a crear proyecto 
